@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기업마당 지원사업 실시간 매칭</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f8f9fc;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border-top: 6px solid;
+            border-image: linear-gradient(90deg, #1e3a5f 0%, #2874a6 50%, #1e3a5f 100%) 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #152a45 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #2874a6 0%, #1e3a5f 50%, #2874a6 100%);
+        }
+
+        .header h1 {
+            font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+            line-height: 1.3;
+        }
+
+        .header p {
+            font-size: 15px;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-bottom: 0;
+        }
+
+        .header-contact {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .form-section {
+            padding: 50px 40px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1a1a2e;
+            font-size: 15px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a1a2e;
+            transition: all 0.3s;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2874a6;
+            box-shadow: 0 0 0 4px rgba(40, 116, 166, 0.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2874a6 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Noto Sans KR', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(30, 58, 95, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #2874a6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            padding: 50px 40px;
+            background: #f8f9fc;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .result-header h2 {
+            font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .result-count {
+            font-size: 18px;
+            color: #2874a6;
+            font-weight: 700;
+        }
+
+        .program-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+            border-left: 4px solid #2874a6;
+        }
+
+        .program-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(30, 58, 95, 0.12);
+        }
+
+        .program-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .program-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .meta-item strong {
+            color: #1a1a2e;
+            margin-right: 6px;
+            font-weight: 700;
+        }
+
+        .program-category {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #e8f4f8;
+            color: #1e3a5f;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .program-period {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .program-description {
+            color: #64748b;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .btn-detail {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #2874a6;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-detail:hover {
+            background: #1e3a5f;
+            transform: translateX(2px);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .no-results h3 {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .no-results p {
+            color: #94a3b8;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .btn-reset {
+            display: block;
+            width: 220px;
+            margin: 40px auto 0;
+            padding: 14px;
+            background: white;
+            color: #2874a6;
+            border: 2px solid #2874a6;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-reset:hover {
+            background: #2874a6;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 40px;
+            background: #1a1a2e;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .footer-contact {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .footer-copyright {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 16px;
+            }
+
+            .header {
+                padding: 30px 24px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .form-section {
+                padding: 30px 24px;
+            }
+
+            .results {
+                padding: 30px 24px;
+            }
+
+            .program-card {
+                padding: 24px;
+                border-radius: 16px;
+            }
+
+            .program-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .footer {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>중소기업 지원사업 매칭 진단</h1>
+            <p>기업 정보를 입력하시면 맞춤형 정부지원사업을 추천해드립니다</p>
+            <div class="header-contact">☎ 02-6357-2025</div>
+        </div>
+
+        <div class="form-section" id="formSection">
+            <form id="matchingForm">
+                <div class="form-group">
+                    <label for="companyName">1. 기업명 *</label>
+                    <input type="text" id="companyName" placeholder="예: (주)홍길동컴퍼니" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="region">2. 소재지 (지역) *</label>
+                    <select id="region" required>
+                        <option value="">선택하세요</option>
+                        <option value="서울">서울</option>
+                        <option value="부산">부산</option>
+                        <option value="대구">대구</option>
+                        <option value="인천">인천</option>
+                        <option value="광주">광주</option>
+                        <option value="대전">대전</option>
+                        <option value="울산">울산</option>
+                        <option value="세종">세종</option>
+                        <option value="경기">경기</option>
+                        <option value="강원">강원</option>
+                        <option value="충북">충북</option>
+                        <option value="충남">충남</option>
+                        <option value="전북">전북</option>
+                        <option value="전남">전남</option>
+                        <option value="경북">경북</option>
+                        <option value="경남">경남</option>
+                        <option value="제주">제주</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="industry">3. 업종 *</label>
+                    <select id="industry" required>
+                        <option value="">선택하세요</option>
+                        <option value="제조업">제조업</option>
+                        <option value="식품제조업">식품제조업</option>
+                        <option value="섬유/의복">섬유/의복 제조업</option>
+                        <option value="화학제품">화학제품 제조업</option>
+                        <option value="의료/정밀기기">의료/정밀기기 제조업</option>
+                        <option value="전자/전기">전자/전기 장비 제조업</option>
+                        <option value="기계/장비">기계/장비 제조업</option>
+                        <option value="자동차">자동차/부품 제조업</option>
+                        <option value="건설업">건설업</option>
+                        <option value="도소매업">도매 및 소매업</option>
+                        <option value="운수/물류">운수 및 창고업</option>
+                        <option value="숙박/음식">숙박 및 음식점업</option>
+                        <option value="출판/영상">출판/영상/방송통신업</option>
+                        <option value="정보통신업">정보통신업(IT)</option>
+                        <option value="소프트웨어">소프트웨어 개발업</option>
+                        <option value="전문과학기술">전문/과학/기술 서비스업</option>
+                        <option value="사업지원서비스">사업지원 서비스업</option>
+                        <option value="교육서비스업">교육 서비스업</option>
+                        <option value="보건/사회복지">보건 및 사회복지 서비스업</option>
+                        <option value="예술/스포츠">예술/스포츠/여가 서비스업</option>
+                        <option value="기타서비스업">기타 서비스업</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="companyType">4. 기업 유형 *</label>
+                    <select id="companyType" required>
+                        <option value="">선택하세요</option>
+                        <option value="소상공인">소상공인</option>
+                        <option value="스타트업">스타트업</option>
+                        <option value="중소기업">중소기업</option>
+                        <option value="중견기업">중견기업</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="interest_field">5. 관심분야</label>
+                    <select id="interest_field">
+                        <option value="">선택하세요</option>
+                        <option value="금융">금융</option>
+                        <option value="기술">기술/R&D</option>
+                        <option value="인력">인력/채용</option>
+                        <option value="수출">수출/해외진출</option>
+                        <option value="내수">내수/판로</option>
+                        <option value="창업">창업</option>
+                        <option value="경영">경영/컨설팅</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="businessStage">6. 사업 연차 *</label>
+                    <select id="businessStage" required>
+                        <option value="">선택하세요</option>
+                        <option value="예비창업">예비창업 (사업 준비 중)</option>
+                        <option value="창업 1년 미만">창업 1년 미만</option>
+                        <option value="창업 1~3년">창업 1~3년</option>
+                        <option value="창업 3~5년">창업 3~5년</option>
+                        <option value="창업 5~7년">창업 5~7년</option>
+                        <option value="창업 7~10년">창업 7~10년</option>
+                        <option value="운영 10년 이상">운영 10년 이상</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="revenue">7. 최근 연매출 *</label>
+                    <select id="revenue" required>
+                        <option value="">선택하세요</option>
+                        <option value="매출없음">매출 없음 (예비창업)</option>
+                        <option value="1억 미만">1억 미만</option>
+                        <option value="1억~5억">1억 ~ 5억</option>
+                        <option value="5억~10억">5억 ~ 10억</option>
+                        <option value="10억~50억">10억 ~ 50억</option>
+                        <option value="50억~100억">50억 ~ 100억</option>
+                        <option value="100억 이상">100억 이상</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="employees">8. 직원 수 *</label>
+                    <select id="employees" required>
+                        <option value="">선택하세요</option>
+                        <option value="1명">1명 (대표만)</option>
+                        <option value="2~5명">2 ~ 5명</option>
+                        <option value="6~10명">6 ~ 10명</option>
+                        <option value="11~30명">11 ~ 30명</option>
+                        <option value="31~50명">31 ~ 50명</option>
+                        <option value="51~100명">51 ~ 100명</option>
+                        <option value="100명 이상">100명 이상</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tech_level">9. 기술 수준</label>
+                    <select id="tech_level">
+                        <option value="">선택하세요</option>
+                        <option value="해당없음">해당 없음</option>
+                        <option value="기술개발 준비">기술개발 준비 단계</option>
+                        <option value="R&D 진행중">R&D 진행 중</option>
+                        <option value="특허 보유">특허 보유</option>
+                        <option value="기술우수기업">기술우수기업 인증</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="certifications">10. 경영 인증 (복수선택 가능)</label>
+                    <div style="background: #f8f9fc; padding: 18px; border-radius: 12px; border: 2px solid #e2e8f0;">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="cert" value="벤처기업" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            벤처기업 인증
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="cert" value="이노비즈" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            이노비즈(Inno-Biz) 인증
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="cert" value="메인비즈" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            메인비즈(Main-Biz) 인증
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="cert" value="녹색기업" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            녹색기업 인증
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="cert" value="ISO" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            ISO 인증 (9001, 14001 등)
+                        </label>
+                        <label style="display: block; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="cert" value="없음" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            해당 없음
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="export_status">11. 수출 여부</label>
+                    <select id="export_status">
+                        <option value="">선택하세요</option>
+                        <option value="수출 안함">수출 안함</option>
+                        <option value="수출 준비중">수출 준비 중</option>
+                        <option value="수출 진행중">수출 진행 중</option>
+                        <option value="수출 실적 있음">수출 실적 있음</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="support_need">12. 주요 지원 희망 분야 (복수선택 가능) *</label>
+                    <div style="background: #f8f9fc; padding: 18px; border-radius: 12px; border: 2px solid #e2e8f0;">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="support" value="자금/융자" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            자금/융자 지원
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="support" value="기술개발" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            기술개발/R&D
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="support" value="인력채용" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            인력 채용/교육
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="support" value="판로개척" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            판로 개척/마케팅
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="support" value="수출지원" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            수출 지원
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="support" value="컨설팅" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            경영 컨설팅
+                        </label>
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="support" value="시설/장비" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            시설/장비 지원
+                        </label>
+                        <label style="display: block; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" name="support" value="인증/특허" style="margin-right: 8px; width: 18px; height: 18px; vertical-align: middle;">
+                            인증/특허 지원
+                        </label>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-submit" onclick="searchPrograms()">
+                    💡 지원사업 찾기
+                </button>
+            </form>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>지원사업을 검색하고 있습니다...</p>
+        </div>
+
+        <div class="results" id="results">
+            <div class="result-header">
+                <h2>매칭 결과</h2>
+                <p class="result-count" id="resultCount"></p>
+            </div>
+            <div id="programList"></div>
+            <button class="btn-reset" onclick="resetForm()">🔄 다시 검색하기</button>
+        </div>
+
+        <div class="footer">
+            <div class="footer-contact">☎ 02-6357-2025</div>
+            <div class="footer-copyright">© 코리아경영자문</div>
+        </div>
+    </div>
+
+    <script>
+        // 버튼 클릭 시 실행되는 함수
+        function searchPrograms() {
+            // 인증 정보 수집
+            var certCheckboxes = document.getElementsByName('cert');
+            var certifications = [];
+            for (var i = 0; i < certCheckboxes.length; i++) {
+                if (certCheckboxes[i].checked) {
+                    certifications.push(certCheckboxes[i].value);
+                }
+            }
+            
+            // 지원 희망 분야 수집
+            var supportCheckboxes = document.getElementsByName('support');
+            var supportNeeds = [];
+            for (var j = 0; j < supportCheckboxes.length; j++) {
+                if (supportCheckboxes[j].checked) {
+                    supportNeeds.push(supportCheckboxes[j].value);
+                }
+            }
+            
+            // 입력값 가져오기
+            var formData = {
+                companyName: document.getElementById('companyName').value,
+                region: document.getElementById('region').value,
+                industry: document.getElementById('industry').value,
+                companyType: document.getElementById('companyType').value,
+                interestField: document.getElementById('interest_field').value,
+                businessStage: document.getElementById('businessStage').value,
+                revenue: document.getElementById('revenue').value,
+                employees: document.getElementById('employees').value,
+                techLevel: document.getElementById('tech_level').value,
+                certifications: certifications,
+                exportStatus: document.getElementById('export_status').value,
+                supportNeeds: supportNeeds
+            };
+
+            // 필수 항목 체크
+            if (!formData.companyName || !formData.region || !formData.industry || 
+                !formData.companyType || !formData.businessStage || !formData.revenue || 
+                !formData.employees) {
+                alert('필수 항목을 모두 입력해주세요.');
+                return;
+            }
+            
+            // 지원 희망 분야 최소 1개 선택 체크
+            if (formData.supportNeeds.length === 0) {
+                alert('주요 지원 희망 분야를 최소 1개 이상 선택해주세요.');
+                return;
+            }
+
+            console.log('입력 데이터:', formData);
+
+            // 로딩 표시
+            document.getElementById('formSection').style.display = 'none';
+            document.getElementById('loading').classList.add('show');
+
+            // 1.5초 후 결과 표시
+            setTimeout(function() {
+                var programs = generateDummyData(formData);
+                var matchedPrograms = matchPrograms(programs, formData);
+                var consultantComment = generateConsultantComment(formData, matchedPrograms);
+                displayResults(matchedPrograms, formData, consultantComment);
+            }, 1500);
+        }
+
+        // 컨설턴트 코멘트 생성
+        function generateConsultantComment(formData, matchedPrograms) {
+            var comment = {
+                summary: '',
+                analysis: [],
+                recommendations: [],
+                detailedAdvice: []
+            };
+
+            // 1. 사업 단계별 상세 분석
+            var stageAnalysis = '';
+            var stageAdvice = '';
+            if (formData.businessStage.indexOf('예비') >= 0) {
+                stageAnalysis = '예비창업 단계입니다. 현재는 사업 아이템 구체화와 초기 자금 확보가 가장 중요한 시점입니다.';
+                stageAdvice = '창업 전문 교육 프로그램과 예비창업자 대상 지원사업에 우선 집중하시기 바랍니다. 사업계획서 작성 역량이 선발의 핵심입니다.';
+            } else if (formData.businessStage.indexOf('1년 미만') >= 0) {
+                stageAnalysis = '창업 초기 단계(1년 미만)입니다. 생존율이 가장 낮은 시기로 현금흐름 관리와 초기 고객 확보가 생명입니다.';
+                stageAdvice = '운영자금 지원과 판로개척 사업을 적극 활용하세요. 이 시기에는 작은 매출이라도 발생시키는 것이 중요하며, 정부지원금은 보조 수단으로 활용해야 합니다.';
+            } else if (formData.businessStage.indexOf('1~3년') >= 0) {
+                stageAnalysis = '창업 초기(1~3년) 단계입니다. 사업모델 검증과 시장 안착을 위한 중요한 시기입니다.';
+                stageAdvice = '제품/서비스 고도화와 마케팅 강화가 필요한 시점입니다. 기술개발 지원사업과 마케팅 지원사업을 병행 추진하시기 바랍니다.';
+            } else if (formData.businessStage.indexOf('3~5년') >= 0) {
+                stageAnalysis = '성장기 진입(3~5년) 단계입니다. 사업 확장과 조직 체계화를 준비해야 할 시점입니다.';
+                stageAdvice = '인력 채용 지원과 시설/장비 지원을 통해 생산능력을 확대하세요. 이 시기부터는 규모의 경제를 만들어가는 것이 중요합니다.';
+            } else if (formData.businessStage.indexOf('5~7년') >= 0) {
+                stageAnalysis = '성장 중반(5~7년) 단계입니다. 지속가능한 성장 동력 확보와 경쟁력 강화가 필요합니다.';
+                stageAdvice = '기술 고도화와 신시장 개척에 집중하세요. 수출 지원사업과 R&D 지원을 통해 새로운 성장 동력을 확보해야 합니다.';
+            } else if (formData.businessStage.indexOf('7~10년') >= 0) {
+                stageAnalysis = '성숙기 진입(7~10년) 단계입니다. 재도약을 위한 혁신이 필요한 시점입니다.';
+                stageAdvice = '스마트공장, 디지털전환 등 혁신 사업을 통해 생산성을 높이고, 글로벌 시장 진출을 본격 검토하시기 바랍니다.';
+            } else {
+                stageAnalysis = '안정기(10년 이상) 기업입니다. 지속성장과 경쟁우위 유지를 위한 혁신 전략이 필요합니다.';
+                stageAdvice = '기존 사업의 고부가가치화와 신사업 발굴을 병행하세요. 정부 R&D 과제와 글로벌 강소기업 육성사업 등 대형 과제에 도전하시기 바랍니다.';
+            }
+            comment.analysis.push(stageAnalysis);
+            comment.detailedAdvice.push(stageAdvice);
+
+            // 2. 매출 규모별 상세 분석
+            var revenueAnalysis = '';
+            var revenueAdvice = '';
+            if (formData.revenue.indexOf('없음') >= 0) {
+                revenueAnalysis = '아직 매출이 발생하지 않은 단계입니다. 초기 자금 확보가 가장 시급합니다.';
+                revenueAdvice = '예비창업패키지, 창업도약패키지 등 사업화 자금 지원사업에 집중 신청하세요. 동시에 크라우드펀딩 등 민간 자금 조달도 병행 검토가 필요합니다.';
+            } else if (formData.revenue.indexOf('1억 미만') >= 0) {
+                revenueAnalysis = '연매출 1억 미만으로 초기 매출 단계입니다. 매출 확대가 최우선 과제입니다.';
+                revenueAdvice = '판로개척 지원사업(온라인 쇼핑몰 입점, 전시회 참가 등)을 적극 활용하고, 운영자금 융자로 현금흐름을 안정화하세요.';
+            } else if (formData.revenue.indexOf('1억') >= 0 && formData.revenue.indexOf('5억') >= 0) {
+                revenueAnalysis = '연매출 1~5억 구간으로 초기 성장 단계입니다. 안정적 성장 기반 구축이 필요합니다.';
+                revenueAdvice = '제품 경쟁력 강화와 판매채널 다각화에 투자하세요. 기술개발과 마케팅 지원사업을 균형있게 활용하시기 바랍니다.';
+            } else if (formData.revenue.indexOf('5억') >= 0 && formData.revenue.indexOf('10억') >= 0) {
+                revenueAnalysis = '연매출 5~10억 구간으로 본격적인 성장 단계입니다. 조직화와 시스템화가 필요한 시점입니다.';
+                revenueAdvice = '우수 인력 채용 지원사업과 스마트공장 등 시스템 구축 지원을 활용해 생산성을 높이세요. 품질인증 획득도 검토하시기 바랍니다.';
+            } else if (formData.revenue.indexOf('10억') >= 0 && formData.revenue.indexOf('50억') >= 0) {
+                revenueAnalysis = '연매출 10~50억 구간으로 중견 중소기업 단계입니다. 규모의 경제와 기술경쟁력이 핵심입니다.';
+                revenueAdvice = '대규모 R&D 과제 수행과 해외시장 진출을 본격 추진하세요. 정부 과제와 함께 수출바우처, 해외전시회 지원 등을 복합 활용하시기 바랍니다.';
+            } else if (formData.revenue.indexOf('50억') >= 0 && formData.revenue.indexOf('100억') >= 0) {
+                revenueAnalysis = '연매출 50~100억 구간으로 강소기업 단계입니다. 글로벌 경쟁력 확보가 과제입니다.';
+                revenueAdvice = '월드클래스300, 글로벌 강소기업 등 대형 육성사업 선정을 목표로 하세요. 기술 자립도 제고와 글로벌 시장 점유율 확대가 핵심입니다.';
+            } else {
+                revenueAnalysis = '연매출 100억 이상으로 안정적인 중견기업 단계입니다. 지속적 혁신과 글로벌 리더십이 중요합니다.';
+                revenueAdvice = '국가전략기술 R&D, 대규모 설비투자 지원 등 대형 과제에 참여하세요. 중견기업 특화 지원사업과 상생협력 프로그램도 적극 활용하시기 바랍니다.';
+            }
+            comment.analysis.push(revenueAnalysis);
+            comment.detailedAdvice.push(revenueAdvice);
+
+            // 3. 기업 유형별 맞춤 분석
+            var typeAnalysis = '';
+            var typeAdvice = '';
+            if (formData.companyType === '소상공인') {
+                typeAnalysis = '소상공인으로 분류됩니다. 경영 안정화와 디지털 전환이 핵심 과제입니다.';
+                typeAdvice = '소상공인 정책자금(낮은 금리), 스마트상점 구축 지원, 배달앱 수수료 지원 등 소상공인 특화 사업을 우선 검토하세요. 지자체별 소상공인 전용 지원사업도 많으니 거주 지역 사업을 꼼꼼히 확인하시기 바랍니다.';
+            } else if (formData.companyType === '스타트업') {
+                typeAnalysis = '스타트업으로 빠른 성장과 투자유치가 중요한 단계입니다.';
+                typeAdvice = '팁스(TIPS), 예비유니콘, K-유니콘 등 스타트업 집중 육성 프로그램에 도전하세요. 민간 투자와 정부 지원을 레버리지하여 빠른 스케일업을 추구하시기 바랍니다. 액셀러레이터 프로그램도 적극 활용하세요.';
+            } else if (formData.companyType === '중소기업') {
+                typeAnalysis = '중소기업으로 가장 많은 정부 지원사업의 대상이 됩니다.';
+                typeAdvice = '중소기업 기술개발사업(R&D), 정책자금(융자), 수출지원, 인력지원 등 전방위 지원사업을 전략적으로 활용하세요. 여러 부처의 사업을 조합하여 종합적인 지원 포트폴리오를 구성하는 것이 중요합니다.';
+            } else if (formData.companyType === '중견기업') {
+                typeAnalysis = '중견기업으로 글로벌 경쟁력 강화와 대기업 도약이 목표가 되어야 합니다.';
+                typeAdvice = '월드클래스300, 글로벌 강소기업, 뿌리기업 육성 등 중견기업 특화 프로그램에 선정되면 장기간 집중 지원을 받을 수 있습니다. 대규모 R&D 과제와 해외투자 지원도 적극 검토하세요.';
+            }
+            comment.analysis.push(typeAnalysis);
+            comment.detailedAdvice.push(typeAdvice);
+
+            // 4. 인증 보유 현황 분석
+            if (formData.certifications && formData.certifications.length > 0 && formData.certifications[0] !== '없음') {
+                var certAnalysis = '보유 인증: ' + formData.certifications.join(', ');
+                var certAdvice = '';
+                
+                if (formData.certifications.indexOf('벤처기업') >= 0) {
+                    certAdvice += '벤처기업 인증을 보유하고 계십니다. 벤처기업 전용 지원사업과 세제 혜택을 적극 활용하세요. ';
+                }
+                if (formData.certifications.indexOf('이노비즈') >= 0) {
+                    certAdvice += '이노비즈 인증으로 기술혁신형 중소기업 지원사업 우대를 받을 수 있습니다. ';
+                }
+                if (formData.certifications.indexOf('메인비즈') >= 0) {
+                    certAdvice += '메인비즈 인증으로 경영혁신형 기업 지원을 받을 수 있습니다. ';
+                }
+                
+                if (certAdvice) {
+                    comment.analysis.push(certAnalysis);
+                    comment.detailedAdvice.push(certAdvice.trim());
+                }
+            } else {
+                comment.detailedAdvice.push('현재 경영인증이 없으신 경우, 벤처기업이나 이노비즈 인증 취득을 검토하세요. 인증 취득 시 가점 부여, 우대금리, 세제 혜택 등 다양한 혜택이 주어집니다.');
+            }
+
+            // 5. 기술 수준 분석
+            if (formData.techLevel && formData.techLevel !== '해당없음') {
+                var techAnalysis = '기술 수준: ' + formData.techLevel;
+                var techAdvice = '';
+                
+                if (formData.techLevel === '기술개발 준비') {
+                    techAdvice = '기술개발 준비 단계입니다. 초기 기술개발 지원사업(R&D 기획, 아이디어 사업화)부터 시작하여 단계적으로 확대하세요.';
+                } else if (formData.techLevel === 'R&D 진행중') {
+                    techAdvice = 'R&D가 진행 중입니다. 중소기업 기술개발사업, 산학연 협력 R&D 등으로 개발비용을 지원받으세요. 성과는 특허 출원으로 반드시 보호하시기 바랍니다.';
+                } else if (formData.techLevel === '특허 보유') {
+                    techAdvice = '특허를 보유하고 계십니다. 지식재산(IP) 기반 사업화 지원과 기술이전 지원사업을 활용하여 특허의 사업화 가치를 극대화하세요.';
+                } else if (formData.techLevel === '기술우수기업') {
+                    techAdvice = '기술우수기업입니다. 기술경쟁력을 바탕으로 대형 R&D 과제와 수출 지원사업에서 높은 평가를 받을 수 있습니다.';
+                }
+                
+                comment.analysis.push(techAnalysis);
+                comment.detailedAdvice.push(techAdvice);
+            }
+
+            // 6. 수출 현황 분석
+            if (formData.exportStatus && formData.exportStatus !== '수출 안함') {
+                var exportAnalysis = '수출 현황: ' + formData.exportStatus;
+                var exportAdvice = '';
+                
+                if (formData.exportStatus === '수출 준비중') {
+                    exportAdvice = '수출을 준비 중이십니다. 무역협회, KOTRA의 수출 교육 프로그램과 해외시장조사 지원을 먼저 활용하세요. 초보 수출기업 지원사업으로 시작하시기 바랍니다.';
+                } else if (formData.exportStatus === '수출 진행중') {
+                    exportAdvice = '수출이 진행 중입니다. 수출바우처, 해외전시회 지원, 해외마케팅 지원을 통해 수출 확대를 도모하세요. 수출 실적이 쌓이면 더 많은 지원 기회가 열립니다.';
+                } else if (formData.exportStatus === '수출 실적 있음') {
+                    exportAdvice = '수출 실적이 있습니다. 글로벌 강소기업 육성, 수출유망중소기업 지원 등 상위 단계 지원사업에 도전하세요. 해외 법인 설립이나 현지화 지원도 검토하시기 바랍니다.';
+                }
+                
+                comment.analysis.push(exportAnalysis);
+                comment.detailedAdvice.push(exportAdvice);
+            }
+
+            // 7. 인력 규모 분석
+            var employeeAnalysis = '직원 수: ' + formData.employees;
+            var employeeAdvice = '';
+            if (formData.employees === '1명') {
+                employeeAdvice = '1인 기업입니다. 인력 확충이 시급하다면 청년 채용 지원사업(인건비 50~80% 지원)을 적극 활용하세요. 또는 프리랜서 활용 지원사업도 검토하시기 바랍니다.';
+            } else if (formData.employees.indexOf('2~5명') >= 0 || formData.employees.indexOf('6~10명') >= 0) {
+                employeeAdvice = '소규모 조직입니다. 핵심 인력 충원을 위해 청년 채용 지원, 경력 단절 여성 채용 지원 등 인건비 지원사업을 활용하세요.';
+            } else if (formData.employees.indexOf('11~30명') >= 0) {
+                employeeAdvice = '중소 규모 조직입니다. 조직 체계화와 인력 전문화가 필요한 시점입니다. 직무교육 지원, 재직자 훈련 지원 등을 통해 인적자원 경쟁력을 높이세요.';
+            } else {
+                employeeAdvice = '상당한 조직 규모입니다. 우수 인력 유치와 핵심 인재 유지가 중요합니다. 기업 맞춤형 훈련, 해외연수 지원 등 고급 인력개발 지원사업을 활용하시기 바랍니다.';
+            }
+            comment.detailedAdvice.push(employeeAdvice);
+
+            // 8. 매칭 결과 기반 종합 평가
+            if (matchedPrograms.length >= 5) {
+                comment.summary = '✅ 귀사 조건에 매우 적합한 다수의 지원사업이 확인되었습니다.';
+                comment.recommendations.push('✓ 매칭도가 높은 상위 3개 사업에 우선 신청하시기 바랍니다.');
+                comment.recommendations.push('✓ 신청 마감일이 임박한 사업부터 차례로 준비하세요.');
+                comment.recommendations.push('✓ 사업별로 요구하는 서류와 증빙자료를 미리 준비해두시기 바랍니다.');
+            } else if (matchedPrograms.length >= 2) {
+                comment.summary = '💡 귀사 조건에 적합한 지원사업이 확인되었습니다.';
+                comment.recommendations.push('✓ 매칭된 사업의 세부 요건(매출액, 업력, 지역 등)을 꼼꼼히 확인하세요.');
+                comment.recommendations.push('✓ 필요시 사업계획서 작성 컨설팅을 받으시는 것을 권장합니다.');
+                comment.recommendations.push('✓ 경쟁률이 높은 사업의 경우 차별화된 강점을 부각하세요.');
+            } else if (matchedPrograms.length === 1) {
+                comment.summary = '⚠️ 현재 조건에 맞는 사업이 제한적입니다.';
+                comment.recommendations.push('✓ 매칭된 사업에 집중 지원하되, 지원 분야를 다각화하여 추가 검색을 권장합니다.');
+                comment.recommendations.push('✓ 향후 공고될 사업을 위해 사업계획서를 미리 준비하시기 바랍니다.');
+                comment.recommendations.push('✓ 기업 인증(벤처, 이노비즈 등) 취득으로 지원 기회를 넓히세요.');
+            } else {
+                comment.summary = '❌ 현재 조건에 매칭되는 진행 중인 사업이 없습니다.';
+                comment.recommendations.push('✓ 업종이나 지역 조건을 확대하여 재검색을 권장합니다.');
+                comment.recommendations.push('✓ 전문가 상담을 통해 숨은 지원사업을 찾아보시기 바랍니다.');
+                comment.recommendations.push('✓ 정기적으로 기업마당을 모니터링하여 신규 공고를 확인하세요.');
+                comment.recommendations.push('✓ 지자체 및 공공기관의 자체 지원사업도 병행 검토하시기 바랍니다.');
+            }
+
+            // 9. 지원 희망 분야별 세부 전략
+            var supportAdvice = '';
+            if (formData.supportNeeds && formData.supportNeeds.length > 0) {
+                var supportStr = formData.supportNeeds.join(', ');
+                supportAdvice = '선택하신 희망 분야: ' + supportStr + '. ';
+                
+                for (var n = 0; n < formData.supportNeeds.length; n++) {
+                    var need = formData.supportNeeds[n];
+                    
+                    if (need.indexOf('자금') >= 0) {
+                        supportAdvice += '💰 자금 지원 전략: 정책자금 융자는 금리가 낮지만 대출이므로 상환 계획이 필수입니다. 보조금 사업은 비용 일부를 정부가 부담하므로 부담이 적지만 경쟁이 치열합니다. 융자와 보조금을 적절히 조합하여 활용하시기 바랍니다. ';
+                    } else if (need.indexOf('기술') >= 0) {
+                        supportAdvice += '🔬 기술개발 전략: R&D 지원은 보통 1~3년의 장기 과제입니다. 과제 선정률을 높이려면 명확한 기술개발 목표와 실현 가능한 계획이 중요합니다. 산학연 협력을 통해 전문성을 보강하면 유리합니다. ';
+                    } else if (need.indexOf('수출') >= 0) {
+                        supportAdvice += '🌏 수출 지원 전략: 수출 지원사업은 실적 증빙이 매우 중요합니다. 바이어 상담 내역, 견적서, 계약서 등을 체계적으로 관리하세요. KOTRA, 무역협회의 컨설팅을 먼저 받으시기 바랍니다. ';
+                    } else if (need.indexOf('인력') >= 0) {
+                        supportAdvice += '👥 인력 지원 전략: 청년 채용 지원은 인건비를 50~80% 지원하지만, 일정 기간(보통 6개월~1년) 고용 유지 의무가 있습니다. 중장기 인력계획을 세우고 신청하시기 바랍니다. ';
+                    } else if (need.indexOf('판로') >= 0) {
+                        supportAdvice += '🛒 판로 지원 전략: 온라인 쇼핑몰 입점, 전시회 참가, 홍보마케팅 지원 등을 복합 활용하세요. 단발성 지원보다는 체계적인 마케팅 계획 하에 연속적으로 활용하는 것이 효과적입니다. ';
+                    } else if (need.indexOf('컨설팅') >= 0) {
+                        supportAdvice += '📊 컨설팅 지원 전략: 경영컨설팅 비용의 70~90%를 지원받을 수 있습니다. 회계/세무, 인사/조직, 마케팅 등 취약 분야를 집중 보완하세요. 컨설팅 결과를 실행하는 것이 가장 중요합니다. ';
+                    }
+                }
+            }
+            if (supportAdvice) comment.detailedAdvice.push(supportAdvice);
+
+            // 10. 실행 전략
+            comment.detailedAdvice.push('📌 신청 전 체크리스트: ① 사업공고문 정독 ② 필수 제출서류 확인 ③ 자격요건 재확인 ④ 사업계획서 초안 작성 ⑤ 외부 검토 받기 ⑥ 최종 제출');
+            comment.detailedAdvice.push('⏰ 마감일 관리: 마감 1~2주 전에 미리 제출하여 시스템 오류나 서류 보완에 대비하세요. 마감일 당일은 접속 폭주로 제출이 어려울 수 있습니다.');
+
+            return comment;
+        }
+
+        // 매칭 로직
+        function matchPrograms(programs, formData) {
+            var today = new Date();
+            var tier1 = []; // 희망분야 & 지원가능
+            var tier2 = []; // 비희망분야 & 지원가능
+            var tier3 = []; // 희망분야 & 지원어려움
+            
+            for (var i = 0; i < programs.length; i++) {
+                var program = programs[i];
+                var score = 0;
+                var isPreferred = false; // 희망 분야 여부
+                var isEligible = true; // 지원 가능 여부
+                
+                // 1. 신청기간 체크
+                var periodMatch = checkPeriod(program.reqstBeginEndDe, today);
+                if (!periodMatch) {
+                    continue; // 기간 종료된 사업은 아예 제외
+                }
+
+                // 2. 지역 매칭 (필수)
+                if (formData.region) {
+                    var hashTags = program.hashTags || '';
+                    if (hashTags.indexOf(formData.region) >= 0) {
+                        score += 10;
+                    } else {
+                        isEligible = false; // 지역 불일치는 지원 어려움
+                    }
+                }
+
+                // 3. 지원 희망 분야 매칭 (핵심)
+                var programCategory = program.pldirSportRealmLclasCodeNm || program.lcategory;
+                var supportMapping = {
+                    '자금/융자': '금융',
+                    '기술개발': '기술',
+                    '인력채용': '인력',
+                    '판로개척': '내수',
+                    '수출지원': '수출',
+                    '컨설팅': '경영',
+                    '시설/장비': '기술',
+                    '인증/특허': '기술'
+                };
+                
+                for (var j = 0; j < formData.supportNeeds.length; j++) {
+                    var targetCategory = supportMapping[formData.supportNeeds[j]] || formData.supportNeeds[j];
+                    if (programCategory && programCategory.indexOf(targetCategory) >= 0) {
+                        isPreferred = true;
+                        score += 15; // 희망분야 매칭 시 높은 점수
+                        break;
+                    }
+                }
+
+                // 4. 업종 매칭
+                if (formData.industry) {
+                    // 업종은 정확 매칭보다는 참고용
+                    score += 3;
+                }
+
+                // 5. 관심분야 매칭
+                if (formData.interestField) {
+                    if (programCategory && programCategory.indexOf(formData.interestField) >= 0) {
+                        score += 5;
+                    }
+                }
+
+                // 6. 기업 유형 매칭
+                var targetInfo = program.trgetNm || '';
+                if (formData.companyType === '소상공인' && targetInfo.indexOf('소상공인') >= 0) {
+                    score += 8;
+                } else if (formData.companyType === '스타트업' && targetInfo.indexOf('창업') >= 0) {
+                    score += 8;
+                } else if (formData.companyType === '중소기업' && targetInfo.indexOf('중소기업') >= 0) {
+                    score += 8;
+                } else if (formData.companyType === '중견기업' && targetInfo.indexOf('중견') >= 0) {
+                    score += 8;
+                }
+
+                // 7. 창업 연차 매칭
+                if (formData.businessStage && formData.businessStage.indexOf('창업') >= 0) {
+                    if (programCategory && programCategory.indexOf('창업') >= 0) {
+                        score += 7;
+                    }
+                }
+
+                // 8. 수출 여부 매칭
+                if (formData.exportStatus && formData.exportStatus.indexOf('수출') >= 0) {
+                    if (programCategory && programCategory.indexOf('수출') >= 0) {
+                        score += 7;
+                    }
+                }
+
+                program.matchScore = score;
+                program.isPreferred = isPreferred;
+                program.isEligible = isEligible;
+
+                // 3단계 분류
+                if (isPreferred && isEligible) {
+                    tier1.push(program); // 1순위: 희망분야 & 지원가능
+                } else if (!isPreferred && isEligible) {
+                    tier2.push(program); // 2순위: 비희망분야 & 지원가능
+                } else if (isPreferred && !isEligible) {
+                    tier3.push(program); // 3순위: 희망분야 & 지원어려움
+                }
+            }
+
+            // 각 티어 내에서 점수순 정렬
+            tier1.sort(function(a, b) { return b.matchScore - a.matchScore; });
+            tier2.sort(function(a, b) { return b.matchScore - a.matchScore; });
+            tier3.sort(function(a, b) { return b.matchScore - a.matchScore; });
+
+            // 1순위 → 2순위 → 3순위 순서로 결합
+            var result = tier1.concat(tier2).concat(tier3);
+            
+            // 각 프로그램에 티어 정보 추가
+            for (var k = 0; k < tier1.length; k++) {
+                tier1[k].tier = 1;
+            }
+            for (var l = 0; l < tier2.length; l++) {
+                tier2[l].tier = 2;
+            }
+            for (var m = 0; m < tier3.length; m++) {
+                tier3[m].tier = 3;
+            }
+
+            return result;
+        }
+
+        // 신청기간 체크
+        function checkPeriod(periodStr, today) {
+            if (!periodStr || periodStr.indexOf('~') < 0) return false;
+            var endDateStr = periodStr.split('~')[1].trim();
+            var endDate = parseDate(endDateStr);
+            return endDate >= today;
+        }
+
+        // 날짜 파싱
+        function parseDate(dateStr) {
+            var year = dateStr.substring(0, 4);
+            var month = dateStr.substring(4, 6);
+            var day = dateStr.substring(6, 8);
+            return new Date(year, month - 1, day);
+        }
+
+        // 결과 표시
+        function displayResults(programs, formData, consultantComment) {
+            document.getElementById('loading').classList.remove('show');
+            document.getElementById('results').classList.add('show');
+            
+            var resultCount = document.getElementById('resultCount');
+            var programList = document.getElementById('programList');
+            
+            resultCount.textContent = formData.companyName + '님께 총 ' + programs.length + '개의 지원사업이 매칭되었습니다';
+            
+            // 컨설턴트 코멘트 추가
+            var commentHtml = '<div style="background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%); border-left: 5px solid #f59e0b; padding: 30px; border-radius: 20px; margin-bottom: 40px;">';
+            commentHtml += '<div style="display: flex; align-items: center; margin-bottom: 20px;">';
+            commentHtml += '<span style="font-size: 32px; margin-right: 15px;">👨‍💼</span>';
+            commentHtml += '<h3 style="font-size: 22px; font-weight: 800; color: #1a1a2e; margin: 0;">코리아경영자문 전문가 분석</h3>';
+            commentHtml += '</div>';
+            
+            commentHtml += '<div style="background: white; padding: 25px; border-radius: 16px; margin-bottom: 20px;">';
+            commentHtml += '<h4 style="font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 15px;">📊 종합 평가</h4>';
+            commentHtml += '<p style="font-size: 15px; line-height: 1.8; color: #1a1a2e; font-weight: 600; margin: 0;">' + consultantComment.summary + '</p>';
+            commentHtml += '</div>';
+            
+            if (consultantComment.analysis.length > 0) {
+                commentHtml += '<div style="background: white; padding: 25px; border-radius: 16px; margin-bottom: 20px;">';
+                commentHtml += '<h4 style="font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 15px;">🔍 기업 현황 분석</h4>';
+                for (var i = 0; i < consultantComment.analysis.length; i++) {
+                    commentHtml += '<p style="font-size: 14px; line-height: 1.8; color: #64748b; margin-bottom: 10px;">• ' + consultantComment.analysis[i] + '</p>';
+                }
+                commentHtml += '</div>';
+            }
+            
+            if (consultantComment.recommendations.length > 0) {
+                commentHtml += '<div style="background: white; padding: 25px; border-radius: 16px; margin-bottom: 20px;">';
+                commentHtml += '<h4 style="font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 15px;">💡 전문가 제언</h4>';
+                for (var j = 0; j < consultantComment.recommendations.length; j++) {
+                    commentHtml += '<p style="font-size: 14px; line-height: 1.8; color: #64748b; margin-bottom: 10px;">' + consultantComment.recommendations[j] + '</p>';
+                }
+                commentHtml += '</div>';
+            }
+            
+            if (consultantComment.detailedAdvice && consultantComment.detailedAdvice.length > 0) {
+                commentHtml += '<div style="background: white; padding: 25px; border-radius: 16px; margin-bottom: 20px;">';
+                commentHtml += '<h4 style="font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 15px;">📋 상세 실행 전략</h4>';
+                for (var k = 0; k < consultantComment.detailedAdvice.length; k++) {
+                    commentHtml += '<p style="font-size: 14px; line-height: 1.9; color: #475569; margin-bottom: 15px; padding-left: 10px; border-left: 3px solid #2874a6;">' + consultantComment.detailedAdvice[k] + '</p>';
+                }
+                commentHtml += '</div>';
+            }
+            
+            commentHtml += '<div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 2px dashed #f59e0b;">';
+            commentHtml += '<p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">상세 컨설팅이 필요하신가요?</p>';
+            commentHtml += '<p style="font-size: 18px; font-weight: 700; color: #1e3a5f;">☎ 02-6357-2025</p>';
+            commentHtml += '</div>';
+            
+            commentHtml += '</div>';
+            
+            if (programs.length === 0) {
+                programList.innerHTML = commentHtml + '<div class="no-results"><h3>😔 매칭되는 지원사업이 없습니다</h3><p>검색 조건을 변경해보시겠어요?</p></div>';
+                return;
+            }
+
+            var html = commentHtml;
+            for (var i = 0; i < programs.length; i++) {
+                var program = programs[i];
+                var matchScore = program.matchScore || 0;
+                var tier = program.tier || 2;
+                var tierLabel = '';
+                var tierColor = '';
+                var borderColor = '';
+                
+                if (tier === 1) {
+                    tierLabel = '✅ 1순위 추천 (희망분야)';
+                    tierColor = '#dcfce7';
+                    borderColor = '#16a34a';
+                } else if (tier === 2) {
+                    tierLabel = '💡 2순위 (검토 가능)';
+                    tierColor = '#e8f4f8';
+                    borderColor = '#2874a6';
+                } else {
+                    tierLabel = '⚠️ 3순위 (조건 확인 필요)';
+                    tierColor = '#fef3c7';
+                    borderColor = '#f59e0b';
+                }
+                
+                html += '<div class="program-card" style="border-left: 4px solid ' + borderColor + ';">';
+                html += '<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">';
+                html += '<span style="background: ' + tierColor + '; color: #1a1a2e; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: 700;">' + tierLabel + '</span>';
+                html += '<span style="color: #64748b; font-size: 13px; font-weight: 600;">매칭도: ' + matchScore + '점</span>';
+                html += '</div>';
+                html += '<div class="program-title">' + (i + 1) + '. ' + program.title + '</div>';
+                html += '<div class="program-meta">';
+                html += '<span class="program-category">' + program.lcategory + '</span>';
+                html += '<div class="meta-item"><strong>📅 신청기간:</strong> <span class="program-period">' + formatPeriod(program.reqstBeginEndDe) + '</span></div>';
+                html += '<div class="meta-item"><strong>🏢 기관:</strong> ' + program.author + '</div>';
+                html += '</div>';
+                html += '<div class="program-description">' + program.bsnsSumryCn + '</div>';
+                html += '<a href="' + program.link + '" target="_blank" rel="noopener noreferrer" onclick="window.open(this.href, \'_blank\'); return false;" class="btn-detail">📋 상세보기</a>';
+                html += '</div>';
+            }
+            
+            programList.innerHTML = html;
+        }
+
+        // 기간 포맷팅
+        function formatPeriod(period) {
+            if (!period) return '상시 접수';
+            var parts = period.split('~');
+            if (parts.length === 2) {
+                var start = formatDate(parts[0].trim());
+                var end = formatDate(parts[1].trim());
+                return start + ' ~ ' + end;
+            }
+            return period;
+        }
+
+        // 날짜 포맷팅
+        function formatDate(dateStr) {
+            if (dateStr.length === 8) {
+                return dateStr.substring(0,4) + '.' + dateStr.substring(4,6) + '.' + dateStr.substring(6,8);
+            }
+            return dateStr;
+        }
+
+        // 폼 초기화
+        function resetForm() {
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('loading').classList.remove('show');
+            document.getElementById('formSection').style.display = 'block';
+            document.getElementById('matchingForm').reset();
+            window.scrollTo(0, 0);
+        }
+
+        // 더미 데이터 생성
+        function generateDummyData(formData) {
+            return [
+                {
+                    title: "2026년 중소기업 기술개발 지원사업 통합 공고",
+                    link: "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116943",
+                    lcategory: "기술",
+                    reqstBeginEndDe: "20260101 ~ 20261231",
+                    author: "중소벤처기업부",
+                    bsnsSumryCn: "중소기업의 기술개발을 지원하여 기술경쟁력을 강화하고 혁신성장을 촉진하는 사업입니다. R&D 투자 비용의 최대 75%까지 지원합니다.",
+                    hashTags: "2026,기술," + formData.region + ",중소벤처기업부",
+                    pldirSportRealmLclasCodeNm: "기술",
+                    trgetNm: "중소기업"
+                },
+                {
+                    title: "2026년 중소기업 정책자금 융자계획 공고",
+                    link: "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116941",
+                    lcategory: "금융",
+                    reqstBeginEndDe: "20260101 ~ 20261231",
+                    author: "중소벤처기업진흥공단",
+                    bsnsSumryCn: "중소기업의 자금난 해소 및 경영안정을 위한 정책자금 융자 지원 사업입니다. 저금리로 운영자금 및 시설자금을 지원합니다.",
+                    hashTags: "2026,금융," + formData.region,
+                    pldirSportRealmLclasCodeNm: "금융",
+                    trgetNm: "중소기업, 소상공인"
+                },
+                {
+                    title: "2026년 식품기능성평가지원 사업 공고",
+                    link: "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116944",
+                    lcategory: "기술",
+                    reqstBeginEndDe: "20251223 ~ 20260116",
+                    author: "한국식품연구원",
+                    bsnsSumryCn: "식품 기능성 평가를 통해 제품 고도화 및 기술 개발을 지원하는 사업입니다.",
+                    hashTags: "2026,기술," + formData.region,
+                    pldirSportRealmLclasCodeNm: "기술",
+                    trgetNm: "중소기업"
+                },
+                {
+                    title: "2026년 이화여대 캠퍼스타운 E-LIFE Challenge 창업경진대회",
+                    link: "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116946",
+                    lcategory: "창업",
+                    reqstBeginEndDe: "20251222 ~ 20260119",
+                    author: "서울특별시",
+                    bsnsSumryCn: "창업 아이디어 경진대회를 통해 예비창업자와 초기 창업자를 발굴하고 지원합니다.",
+                    hashTags: "2026,창업,서울",
+                    pldirSportRealmLclasCodeNm: "창업",
+                    trgetNm: "창업기업"
+                },
+                {
+                    title: "2026년 K-브랜드분쟁 대응전략 지원사업",
+                    link: "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116939",
+                    lcategory: "수출",
+                    reqstBeginEndDe: "20251222 ~ 20260123",
+                    author: "한국지식재산보호원",
+                    bsnsSumryCn: "해외 진출 시 발생하는 브랜드 분쟁에 대응하기 위한 전략 수립을 지원합니다.",
+                    hashTags: "2026,수출," + formData.region,
+                    pldirSportRealmLclasCodeNm: "수출",
+                    trgetNm: "중소기업"
+                },
+                {
+                    title: "[제주] 지역 AI 대전환을 위한 AI솔루션·도입 활용지원사업",
+                    link: "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116912",
+                    lcategory: "기술",
+                    reqstBeginEndDe: "20251222 ~ 20260116",
+                    author: "제주테크노파크",
+                    bsnsSumryCn: "AI 기술 도입 및 활용을 통한 기업의 디지털 전환을 지원합니다.",
+                    hashTags: "2026,기술,제주",
+                    pldirSportRealmLclasCodeNm: "기술",
+                    trgetNm: "중소기업"
+                },
+                {
+                    title: "[서울] 은평구 청년식당 신규입점 청년 모집",
+                    link: "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116913",
+                    lcategory: "창업",
+                    reqstBeginEndDe: "20251222 ~ 20260205",
+                    author: "서울특별시 은평구",
+                    bsnsSumryCn: "청년 외식 창업자를 위한 공간 지원 및 창업 교육 프로그램입니다.",
+                    hashTags: "2026,창업,서울",
+                    pldirSportRealmLclasCodeNm: "창업",
+                    trgetNm: "청년 창업"
+                }
+            ];
+        }
+
+        console.log('스크립트 로드 완료!');
+    </script>
+</body>
+</html>
