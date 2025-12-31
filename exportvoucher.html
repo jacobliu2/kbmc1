@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수출바우처 사전진단 도구</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: #f8f9fc; min-height: 100vh; padding: 20px; }
+        .top-gradient { height: 6px; background: linear-gradient(90deg, #1e3a5f 0%, #2874a6 100%); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
+        .container { max-width: 1000px; margin: 20px auto 0; background: white; border-radius: 24px; padding: 50px; box-shadow: 0 4px 20px rgba(30, 58, 95, 0.08); }
+        .header { text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 2px solid #f8f9fc; }
+        .header h1 { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; color: #1e3a5f; font-size: 2.2em; font-weight: 800; margin-bottom: 12px; }
+        .header p { color: #64748b; font-size: 1.1em; font-weight: 400; }
+        .progress-bar { width: 100%; height: 8px; background: #f8f9fc; border-radius: 16px; margin-bottom: 40px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #1e3a5f 0%, #2874a6 100%); width: 0%; transition: width 0.4s ease; }
+        .category-title { font-size: 1.4em; font-weight: 800; color: #1e3a5f; margin-bottom: 25px; padding-bottom: 12px; border-bottom: 3px solid #2874a6; }
+        .question { margin-bottom: 30px; padding: 30px; background: #f8f9fc; border-radius: 16px; border-left: 5px solid #2874a6; }
+        .question h3 { color: #1a1a2e; margin-bottom: 20px; font-size: 1.15em; font-weight: 700; line-height: 1.6; }
+        .question-note { color: #64748b; font-size: 0.9em; margin-bottom: 15px; font-style: italic; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { display: flex; align-items: center; padding: 16px 20px; background: white; border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-weight: 500; }
+        .option:hover { border-color: #2874a6; background: #f0f7ff; transform: translateX(4px); }
+        .option input[type="radio"], .option input[type="checkbox"] { margin-right: 12px; width: 20px; height: 20px; cursor: pointer; accent-color: #2874a6; }
+        .option.selected { border-color: #1e3a5f; background: #e8f2ff; font-weight: 700; }
+        .navigation { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; }
+        .btn { padding: 16px 40px; border: none; border-radius: 12px; font-size: 1.05em; font-weight: 700; cursor: pointer; transition: all 0.3s ease; font-family: 'Noto Sans KR', sans-serif; }
+        .btn-secondary { background: #f8f9fc; color: #1e3a5f; border: 2px solid #e2e8f0; }
+        .btn-secondary:hover { background: #e2e8f0; border-color: #1e3a5f; }
+        .btn-primary { background: linear-gradient(135deg, #1e3a5f 0%, #2874a6 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(30, 58, 95, 0.3); }
+        .hidden { display: none !important; }
+        .result-section { display: none; }
+        .score-card { background: linear-gradient(135deg, #1e3a5f 0%, #2874a6 100%); color: white; padding: 40px; border-radius: 20px; text-align: center; margin-bottom: 40px; box-shadow: 0 8px 24px rgba(30, 58, 95, 0.2); }
+        .score-card h2 { font-size: 3.5em; font-weight: 800; margin-bottom: 12px; font-family: 'Montserrat', 'Noto Sans KR', sans-serif; }
+        .score-card p { font-size: 1.3em; font-weight: 500; margin-bottom: 10px; }
+        .support-amount { margin-top: 25px; padding-top: 25px; border-top: 2px solid rgba(255,255,255,0.3); }
+        .support-amount p { font-size: 1.1em; margin-bottom: 8px; opacity: 0.9; }
+        .support-amount h3 { font-size: 2.2em; font-weight: 800; margin: 0; }
+        .support-detail { font-size: 0.95em; margin-top: 12px; opacity: 0.85; line-height: 1.6; }
+        .comment-section { background: #f0f7ff; padding: 30px; border-radius: 16px; margin: 40px 0; border-left: 5px solid #2874a6; }
+        .comment-section h3 { color: #1e3a5f; margin-bottom: 20px; font-weight: 800; font-size: 1.3em; }
+        .comment-item { margin-bottom: 18px; padding: 20px; background: white; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .comment-item h4 { color: #2874a6; margin-bottom: 10px; font-size: 1.05em; font-weight: 700; }
+        .comment-item p { color: #1a1a2e; line-height: 1.8; font-weight: 400; }
+        .world-map { margin: 40px 0; padding: 30px; background: #f8f9fc; border-radius: 16px; border: 2px solid #e2e8f0; }
+        .world-map h3 { color: #1e3a5f; margin-bottom: 25px; text-align: center; font-weight: 800; font-size: 1.3em; }
+        .map-container { background: white; padding: 40px 20px; border-radius: 16px; margin-bottom: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 25px; justify-items: center; }
+        .region-gauge-wrapper { text-align: center; }
+        .region-gauge { position: relative; width: 110px; height: 110px; margin: 0 auto 12px; }
+        .gauge-svg { transform: rotate(-90deg); }
+        .gauge-bg { fill: none; stroke: #e2e8f0; stroke-width: 11; }
+        .gauge-fill { fill: none; stroke: #2874a6; stroke-width: 11; stroke-linecap: round; transition: stroke-dashoffset 1.5s ease; }
+        .gauge-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 800; font-size: 1.3em; color: #1e3a5f; }
+        .region-label { font-weight: 700; color: #1a1a2e; font-size: 0.9em; }
+        .region-gauge.rank1 .gauge-fill { stroke: #1e3a5f; stroke-width: 13; }
+        .region-gauge.rank2 .gauge-fill { stroke: #2874a6; stroke-width: 12; }
+        .region-gauge.rank3 .gauge-fill { stroke: #4a90c4; }
+        .top-region-card { background: white; padding: 25px; border-radius: 16px; margin-bottom: 20px; border-left: 5px solid #2874a6; box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08); }
+        .top-region-card h4 { color: #1e3a5f; font-weight: 700; font-size: 1.2em; margin-bottom: 15px; }
+        .top-region-card p { color: #1a1a2e; line-height: 1.8; font-weight: 400; margin-bottom: 8px; }
+        .top-region-card ul { list-style: none; padding-left: 0; margin-top: 12px; }
+        .top-region-card li { color: #1a1a2e; padding: 6px 0; line-height: 1.6; font-weight: 400; }
+        .top-region-card li:before { content: "• "; color: #2874a6; font-weight: bold; margin-right: 8px; }
+        .roadmap-section { background: linear-gradient(135deg, #f0f7ff 0%, #e8f2ff 100%); padding: 35px; border-radius: 16px; margin: 40px 0; border: 2px solid #2874a6; }
+        .roadmap-section h3 { color: #1e3a5f; font-weight: 800; font-size: 1.3em; margin-bottom: 20px; }
+        .roadmap-item { margin-bottom: 25px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08); }
+        .roadmap-item h4 { color: #1e3a5f; font-weight: 700; font-size: 1.1em; margin-bottom: 10px; }
+        .roadmap-item p { color: #1a1a2e; line-height: 1.7; margin-bottom: 8px; }
+        .proposal-section { background: #fff9e6; padding: 30px; border-radius: 16px; margin: 40px 0; border-left: 5px solid #ffa726; }
+        .proposal-section h3 { color: #1e3a5f; margin-bottom: 20px; font-weight: 800; font-size: 1.3em; }
+        .proposal-section h4 { color: #f57c00; margin: 20px 0 10px; font-size: 1.1em; font-weight: 700; }
+        .proposal-section ul { padding-left: 20px; }
+        .proposal-section li { color: #1a1a2e; padding: 8px 0; line-height: 1.7; }
+        .recommendations { background: #f0f7ff; padding: 30px; border-radius: 16px; border-left: 5px solid #2874a6; margin: 40px 0; }
+        .recommendations h3 { color: #1e3a5f; margin-bottom: 20px; font-weight: 800; font-size: 1.3em; }
+        .recommendations ul { list-style: none; padding-left: 0; }
+        .recommendations li { padding: 12px 0; border-bottom: 1px solid #d1e7ff; color: #1a1a2e; font-weight: 500; line-height: 1.6; }
+        .recommendations li:last-child { border-bottom: none; }
+        .recommendations li:before { content: "✓ "; color: #2874a6; font-weight: bold; margin-right: 8px; font-size: 1.1em; }
+        .disclaimer { background: #fff9e6; padding: 25px; border-radius: 16px; border-left: 5px solid #ffa726; margin: 40px 0 20px; text-align: center; }
+        .disclaimer p { color: #1a1a2e; font-size: 1.05em; font-weight: 500; line-height: 1.8; }
+        .disclaimer strong { color: #f57c00; font-weight: 700; }
+        .footer { margin-top: 50px; padding-top: 30px; border-top: 2px solid #f8f9fc; text-align: center; color: #64748b; }
+        .footer-contact { margin-bottom: 12px; font-size: 1.05em; font-weight: 500; color: #1e3a5f; }
+        .footer-copyright { font-size: 0.9em; }
+        @media (max-width: 768px) {
+            .container { padding: 30px 24px; }
+            .header h1 { font-size: 1.6em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-gradient"></div>
+    <div class="container">
+        <div class="header">
+            <h1>수출바우처 사전진단 도구</h1>
+            <p>귀사의 수출 준비도를 진단하고 맞춤형 지원을 받으세요</p>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div id="questionSection"></div>
+        <div class="navigation">
+            <button class="btn btn-secondary hidden" id="prevBtn" onclick="previousQuestion()">이전</button>
+            <button class="btn btn-primary hidden" id="nextBtn" onclick="manualNext()">다음</button>
+        </div>
+        <div class="result-section" id="resultSection">
+            <h2 style="text-align:center;color:#1e3a5f;font-size:2em;font-weight:800;margin-bottom:40px;">진단 결과</h2>
+            <div class="score-card">
+                <h2 id="totalScore">0점</h2>
+                <p id="scoreLevel">수출 준비도 평가</p>
+                <div class="support-amount">
+                    <p>예상 수출바우처 지원금액</p>
+                    <h3 id="expectedSupport">-</h3>
+                    <div class="support-detail" id="supportDetail"></div>
+                </div>
+            </div>
+            
+            <div class="comment-section">
+                <h3>📋 전문가 종합 코멘트</h3>
+                <div id="expertComment"></div>
+            </div>
+            
+            <div class="world-map">
+                <h3>🌍 수출 추천 지역 분석</h3>
+                <div class="map-container" id="mapContainer"></div>
+                <div id="topRegions"></div>
+            </div>
+            
+            <div class="roadmap-section">
+                <h3>🗺️ 수출바우처 향후 로드맵</h3>
+                <div id="roadmapContent"></div>
+            </div>
+            
+            <div class="proposal-section">
+                <h3>📝 사업계획서 작성 가이드</h3>
+                <div id="proposalGuide"></div>
+            </div>
+            
+            <div class="recommendations">
+                <h3>🔗 연계 가능 정부지원사업</h3>
+                <ul id="relatedPrograms"></ul>
+            </div>
+            
+            <div class="disclaimer">
+                <p><strong>※ 안내사항</strong><br>
+                해당 결과는 자가진단을 위한 내용이오니,<br>
+                자세한 내용은 반드시 <strong>전문 컨설턴트(☎ 02-6357-2025)와 상담</strong>하시기 바랍니다.</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <button class="btn btn-primary" onclick="location.reload()">다시 진단하기</button>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-contact">☎ 02-6357-2025</div>
+            <div class="footer-copyright">© 코리아경영자문</div>
+        </div>
+    </div>
+    <script>
+        var currentQuestion = 0;
+        var answers = [];
+        var certifications = [];
+        var userProfile = {
+            productType: null,
+            b2b: null,
+            revenue: null,
+            tier: 'naesu',
+            baseLimit: 30000000,
+            subsidyRate: 50,
+            isTunteNaesu: false
+        };
+        
+        var questions = [
+            { category: "기업 기본 현황", question: "귀사가 수출하고자 하는 제품/서비스의 주요 분야는 무엇입니까?", options: [
+                { text: "식품/음료 (K-Food)", score: 5, productType: 'food' },
+                { text: "뷰티/화장품 (K-Beauty)", score: 5, productType: 'beauty' },
+                { text: "패션/의류/액세서리", score: 5, productType: 'fashion' },
+                { text: "생활용품/홈데코", score: 5, productType: 'lifestyle' },
+                { text: "전자제품/IT기기", score: 5, productType: 'electronics' },
+                { text: "자동차 부품/기계", score: 4, productType: 'automotive' },
+                { text: "화학/소재/원자재", score: 4, productType: 'materials' },
+                { text: "의료기기/헬스케어", score: 5, productType: 'medical' },
+                { text: "문화콘텐츠/교육서비스", score: 5, productType: 'content' },
+                { text: "IT서비스/소프트웨어", score: 5, productType: 'software' }
+            ]},
+            { category: "기업 기본 현황", question: "귀사 제품/서비스의 주요 특성은 무엇입니까?", options: [
+                { text: "B2C (최종 소비자 대상)", score: 5, b2b: false },
+                { text: "B2B (기업 대상)", score: 5, b2b: true },
+                { text: "B2B2C (양쪽 모두)", score: 5, b2b: null }
+            ]},
+            { category: "기업 기본 현황", question: "귀사의 직전년도 매출액 규모는 어떻게 되십니까?", options: [
+                { text: "5억원 미만", score: 5, revenue: 'micro' },
+                { text: "5억~10억원", score: 5, revenue: 'small' },
+                { text: "10억~30억원", score: 4, revenue: 'medium' },
+                { text: "30억~50억원", score: 4, revenue: 'mediumPlus' },
+                { text: "50억원 이상", score: 3, revenue: 'large' }
+            ]},
+            { category: "기업 기본 현황", question: "귀사의 2025년 수출액 규모는 어떻게 되십니까?", options: [
+                { text: "수출액 1,000불 미만 (내수기업)", score: 5, tier: 'naesu', baseLimit: 30000000, subsidyRate: 50 },
+                { text: "1,000불~10만불 미만 (수출초보)", score: 5, tier: 'chobo', baseLimit: 30000000, subsidyRate: 70 },
+                { text: "10만불~100만불 미만 (수출유망)", score: 4, tier: 'yumang', baseLimit: 45000000, subsidyRate: 70 },
+                { text: "100만불~300만불 미만 (수출성장)", score: 4, tier: 'sungjang', baseLimit: 70000000, subsidyRate: 60 },
+                { text: "300만불 이상 (수출강소)", score: 4, tier: 'songso', baseLimit: 100000000, subsidyRate: 50 }
+            ]},
+            { category: "기업 기본 현황", question: "귀사가 보유한 기업 인증을 모두 선택해주세요", note: "* 내수기업 단계에서 해당 인증 보유 시 '튼튼한 내수기업'으로 지원한도 50% 증액 (3,000만원 → 4,500만원)", multiSelect: true, options: [
+                { text: "메인비즈(경영혁신형 중소기업)", value: 'mainbiz', tunte: true },
+                { text: "이노비즈(기술혁신형 중소기업)", value: 'innobiz', tunte: true },
+                { text: "벤처기업", value: 'venture', tunte: true },
+                { text: "성능인증기업", value: 'performance', tunte: true },
+                { text: "TIPS 성공졸업기업", value: 'tips', tunte: true },
+                { text: "아기유니콘/예비유니콘", value: 'unicorn', tunte: true },
+                { text: "초격차 스타트업 1,000+", value: 'startup1000', tunte: true },
+                { text: "도약(Jump-Up) 프로그램 선정기업", value: 'jumpup', tunte: true },
+                { text: "ISO 인증", value: 'iso', tunte: false },
+                { text: "품질인증", value: 'quality', tunte: false },
+                { text: "해외인증", value: 'foreign', tunte: false },
+                { text: "인증 없음", value: 'none', tunte: false }
+            ]},
+            { category: "수출 역량", question: "수출 전담 또는 겸임 인력이 있습니까?", options: [
+                { text: "전담 부서 및 3명 이상", score: 5 },
+                { text: "전담 1~2명", score: 4 },
+                { text: "겸임 인력 있음", score: 3 },
+                { text: "없음", score: 2 }
+            ]},
+            { category: "수출 역량", question: "영어 또는 목표 시장 언어 구사 가능 인력이 있습니까?", options: [
+                { text: "비즈니스 수준 3명 이상", score: 5 },
+                { text: "비즈니스 수준 1~2명", score: 4 },
+                { text: "일상 회화 수준", score: 3 },
+                { text: "없음", score: 2 }
+            ]},
+            { category: "수출 역량", question: "해외 바이어 네트워크를 보유하고 있습니까?", options: [
+                { text: "10개사 이상", score: 5 },
+                { text: "3~9개사", score: 4 },
+                { text: "1~2개사", score: 3 },
+                { text: "없음", score: 2 }
+            ]},
+            { category: "수출 역량", question: "수출 관련 인증을 보유하고 있습니까?", note: "* 예시: CE(유럽), FDA(미국), 할랄(중동), CCC(중국), PSE(일본)", options: [
+                { text: "3개 이상", score: 5 },
+                { text: "1~2개", score: 4 },
+                { text: "준비 중", score: 3 },
+                { text: "없음", score: 2 }
+            ]},
+            { category: "제품 경쟁력", question: "귀사 제품/서비스의 기술력 또는 품질 수준은?", options: [
+                { text: "업계 선도", score: 5 },
+                { text: "국내 상위권", score: 4 },
+                { text: "중상위", score: 3 },
+                { text: "보통", score: 2 }
+            ]},
+            { category: "제품 경쟁력", question: "가격 경쟁력은?", options: [
+                { text: "매우 경쟁력 있음", score: 5 },
+                { text: "경쟁력 있음", score: 4 },
+                { text: "보통", score: 3 },
+                { text: "약함", score: 2 }
+            ]},
+            { category: "제품 경쟁력", question: "지식재산권을 얼마나 보유하고 있습니까?", note: "* 특허, 실용신안, 디자인, 상표권", options: [
+                { text: "10개 이상", score: 5 },
+                { text: "5~9개", score: 4 },
+                { text: "1~4개", score: 3 },
+                { text: "없음", score: 2 }
+            ]},
+            { category: "제품 경쟁력", question: "제품/서비스의 차별화 요소가 있습니까?", options: [
+                { text: "명확한 차별화 다수", score: 5 },
+                { text: "일부 차별화", score: 4 },
+                { text: "보통", score: 3 },
+                { text: "부족", score: 2 }
+            ]},
+            { category: "시장 전략", question: "목표 수출 시장이 명확하게 정의되어 있습니까?", options: [
+                { text: "국가/지역/고객층까지 구체적", score: 5 },
+                { text: "국가/지역까지", score: 4 },
+                { text: "대략적 방향", score: 3 },
+                { text: "미정", score: 2 }
+            ]},
+            { category: "시장 전략", question: "목표 시장 조사를 실시하셨습니까?", options: [
+                { text: "심층 조사 완료", score: 5 },
+                { text: "기본 조사 완료", score: 4 },
+                { text: "진행 중", score: 3 },
+                { text: "미실시", score: 2 }
+            ]},
+            { category: "시장 전략", question: "해외 마케팅 경험이 있습니까?", options: [
+                { text: "다양한 경험", score: 5 },
+                { text: "일부 경험", score: 4 },
+                { text: "시도 중", score: 3 },
+                { text: "없음", score: 2 }
+            ]},
+            { category: "시장 전략", question: "온라인 판매 채널을 운영하고 있습니까?", options: [
+                { text: "글로벌 플랫폼 다수", score: 5 },
+                { text: "일부 플랫폼", score: 4 },
+                { text: "준비 중", score: 3 },
+                { text: "없음", score: 2 }
+            ]},
+            { category: "시장 전략", question: "현지화 준비가 되어 있습니까?", note: "* 언어, 문화, 디자인, 패키징", options: [
+                { text: "충분히 준비됨", score: 5 },
+                { text: "일부 준비됨", score: 4 },
+                { text: "계획 중", score: 3 },
+                { text: "미흡", score: 2 }
+            ]},
+            { category: "지원 필요도", question: "가장 시급한 지원은?", options: [
+                { text: "전시회/박람회", score: 5 },
+                { text: "바이어 발굴", score: 5 },
+                { text: "온라인 마케팅", score: 5 },
+                { text: "시장조사", score: 5 }
+            ]},
+            { category: "지원 필요도", question: "가장 큰 어려움은?", options: [
+                { text: "비용 부담", score: 5 },
+                { text: "인력 부족", score: 4 },
+                { text: "정보 부족", score: 4 },
+                { text: "인증/규제", score: 4 }
+            ]}
+        ];
+        
+        function initializeQuiz() {
+            renderQuestion();
+            updateProgress();
+        }
+        
+        function renderQuestion() {
+            var section = document.getElementById('questionSection');
+            var q = questions[currentQuestion];
+            
+            var categoryTitle = '<div class="category-title">' + q.category + '</div>';
+            var noteHtml = q.note ? '<div class="question-note">' + q.note + '</div>' : '';
+            
+            var optionsHtml = '';
+            if (q.multiSelect) {
+                for (var i = 0; i < q.options.length; i++) {
+                    var checked = certifications.indexOf(q.options[i].value) >= 0 ? 'checked' : '';
+                    var selected = certifications.indexOf(q.options[i].value) >= 0 ? 'selected' : '';
+                    optionsHtml += '<label class="option ' + selected + '">';
+                    optionsHtml += '<input type="checkbox" value="' + q.options[i].value + '" ' + checked + ' onchange="selectCertification()">';
+                    optionsHtml += q.options[i].text;
+                    optionsHtml += '</label>';
+                }
+            } else {
+                for (var i = 0; i < q.options.length; i++) {
+                    var selected = answers[currentQuestion] === i ? 'selected' : '';
+                    var checked = answers[currentQuestion] === i ? 'checked' : '';
+                    optionsHtml += '<label class="option ' + selected + '">';
+                    optionsHtml += '<input type="radio" name="q' + currentQuestion + '" value="' + i + '" ' + checked + ' onchange="selectOption(' + i + ')">';
+                    optionsHtml += q.options[i].text;
+                    optionsHtml += '</label>';
+                }
+            }
+            
+            section.innerHTML = categoryTitle + '<div class="question">' +
+                '<h3>Q' + (currentQuestion + 1) + '. ' + q.question + '</h3>' +
+                noteHtml +
+                '<div class="options">' + optionsHtml + '</div>' +
+                '</div>';
+            
+            var prevBtn = document.getElementById('prevBtn');
+            var nextBtn = document.getElementById('nextBtn');
+            
+            if (currentQuestion === 0) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+            
+            if (q.multiSelect) {
+                nextBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.add('hidden');
+            }
+        }
+        
+        function selectCertification() {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            certifications = [];
+            var hasTunte = false;
+            
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    certifications.push(checkboxes[i].value);
+                    var q = questions[currentQuestion];
+                    for (var j = 0; j < q.options.length; j++) {
+                        if (q.options[j].value === checkboxes[i].value && q.options[j].tunte) {
+                            hasTunte = true;
+                        }
+                    }
+                }
+            }
+            
+            userProfile.certifications = certifications;
+            if (userProfile.tier === 'naesu' && hasTunte) {
+                userProfile.isTunteNaesu = true;
+            }
+            answers[currentQuestion] = certifications.length;
+        }
+        
+        function selectOption(index) {
+            answers[currentQuestion] = index;
+            
+            var q = questions[currentQuestion];
+            var option = q.options[index];
+            
+            if (option.productType) userProfile.productType = option.productType;
+            if (option.b2b !== undefined) userProfile.b2b = option.b2b;
+            if (option.revenue) userProfile.revenue = option.revenue;
+            if (option.tier) userProfile.tier = option.tier;
+            if (option.baseLimit) userProfile.baseLimit = option.baseLimit;
+            if (option.subsidyRate) userProfile.subsidyRate = option.subsidyRate;
+            
+            setTimeout(function() {
+                nextQuestion();
+            }, 300);
+        }
+        
+        function manualNext() {
+            nextQuestion();
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+                updateProgress();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                showResults();
+            }
+        }
+        
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+                updateProgress();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        function updateProgress() {
+            var progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        function showResults() {
+            var totalScore = 0;
+            var maxScore = 0;
+            
+            for (var i = 0; i < questions.length; i++) {
+                var q = questions[i];
+                if (q.multiSelect) {
+                    totalScore += 5;
+                } else if (answers[i] !== undefined) {
+                    totalScore += q.options[answers[i]].score;
+                }
+                
+                var qMax = q.multiSelect ? 5 : 0;
+                if (!q.multiSelect) {
+                    for (var j = 0; j < q.options.length; j++) {
+                        if (q.options[j].score > qMax) qMax = q.options[j].score;
+                    }
+                }
+                maxScore += qMax;
+            }
+            
+            var scorePercentage = Math.round((totalScore / maxScore) * 100);
+            document.getElementById('totalScore').textContent = scorePercentage + '점';
+            
+            var level = '';
+            if (scorePercentage >= 90) level = '최우수 - 수출 준비 완료';
+            else if (scorePercentage >= 75) level = '우수 - 수출 가능';
+            else if (scorePercentage >= 60) level = '양호 - 일부 보완 필요';
+            else if (scorePercentage >= 45) level = '보통 - 준비 필요';
+            else level = '노력 필요 - 체계적 준비 필요';
+            document.getElementById('scoreLevel').textContent = level;
+            
+            // 정확한 지원금 계산
+            var baseLimit = userProfile.baseLimit;
+            var bonusLimit = 0;
+            
+            // 튼튼내수: 내수기업에서 3,000만원 → 4,500만원 (50% 증액)
+            if (userProfile.tier === 'naesu' && userProfile.isTunteNaesu) {
+                baseLimit = 45000000;
+                bonusLimit = 15000000;
+            }
+            
+            var subsidyRate = userProfile.subsidyRate;
+            var supportAmount = Math.floor(baseLimit * (subsidyRate / 100));
+            
+            var supportText = '최대 ' + (supportAmount / 10000).toLocaleString() + '만원';
+            var detailText = '(지원한도 ' + (baseLimit / 10000).toLocaleString() + '만원 × 국고보조율 ' + subsidyRate + '%)';
+            
+            if (userProfile.isTunteNaesu) {
+                detailText += '<br><span style="color:#ffd700;">★ 튼튼한 내수기업 50% 한도 확대 적용 (+' + (bonusLimit / 10000).toLocaleString() + '만원)</span>';
+            }
+            
+            document.getElementById('expectedSupport').textContent = supportText;
+            document.getElementById('supportDetail').innerHTML = detailText;
+            
+            displayExpertComment(scorePercentage);
+            displayRegionAnalysis();
+            displayRoadmap();
+            displayProposalGuide();
+            displayRelatedPrograms();
+            
+            document.getElementById('questionSection').style.display = 'none';
+            document.querySelector('.navigation').style.display = 'none';
+            document.querySelector('.progress-bar').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function displayExpertComment(scorePercentage) {
+            var comment = '';
+            
+            if (scorePercentage >= 75) {
+                comment = '<div class="comment-item"><p><strong>축하합니다!</strong> 귀사는 수출바우처 사업에 즉시 참여 가능한 우수한 수출 준비도를 갖추고 있습니다. ';
+                comment += '2026년 수출바우처 사업(총 1,502억원, 약 4,000개 기업 지원)에서 우대 선정될 가능성이 매우 높습니다. ';
+                comment += '특히 ' + (userProfile.tier === 'naesu' ? '내수기업으로서 해외 진출의 첫 발을 내딛기에 최적의 시기' : '수출 경험을 바탕으로 글로벌 시장 확대 기회') + '입니다. ';
+                comment += '해외 전시회 참가, 온라인 마케팅, 바이어 발굴 등 다양한 서비스를 적극 활용하시기 바랍니다.</p></div>';
+            } else if (scorePercentage >= 60) {
+                comment = '<div class="comment-item"><p>귀사는 양호한 수출 준비도를 갖추고 있으나, 일부 영역에서 보완이 필요합니다. ';
+                comment += '수출바우처의 맞춤형 컨설팅 서비스를 먼저 활용하여 부족한 부분을 보완하신 후, 본격적인 해외 마케팅을 시작하시기를 권장합니다. ';
+                comment += '특히 시장조사, 제품 현지화, 인증 취득 등에 집중하시면 성공적인 수출이 가능할 것으로 판단됩니다.</p></div>';
+            } else {
+                comment = '<div class="comment-item"><p>수출을 위한 체계적인 준비가 필요한 단계입니다. ';
+                comment += '우선 내부 역량(인력, 자금, 생산능력)을 강화하고, 철저한 시장조사를 진행하시기 바랍니다. ';
+                comment += '수출바우처의 역량강화 교육 프로그램과 시장조사 서비스를 우선적으로 활용하시고, ';
+                comment += '중소벤처기업부의 다른 기반 구축 사업(R&D, 인력양성 등)을 병행하시면 단계적으로 수출 준비도를 높일 수 있습니다.</p></div>';
+            }
+            
+            document.getElementById('expertComment').innerHTML = comment;
+        }
+        
+        function displayRegionAnalysis() {
+            var regions = [
+                {name: '아시아·태평양', score: 85, desc: '가장 진입이 용이한 시장', reasons: ['물류비 저렴, 배송 빠름', 'K-콘텐츠 인기로 한국 제품 선호', '전자상거래 급성장', '중산층 소비 증가']},
+                {name: '아메리카', score: 78, desc: '프리미엄 시장', reasons: ['높은 구매력', 'Amazon 등 유통망 발달', 'FDA 인증 가치 높음', '혁신 제품 선호']},
+                {name: '유럽', score: 72, desc: '품질 중시 시장', reasons: ['CE 인증 필수', '친환경·윤리소비', 'EU 단일시장', '프리미엄 가격 가능']}
+            ];
+            
+            var gaugeHtml = '';
+            for (var i = 0; i < regions.length; i++) {
+                var r = regions[i];
+                var circumference = 2 * Math.PI * 45;
+                var offset = circumference - (r.score / 100) * circumference;
+                var rankClass = 'rank' + (i + 1);
+                
+                gaugeHtml += '<div class="region-gauge-wrapper">';
+                gaugeHtml += '<div class="region-gauge ' + rankClass + '">';
+                gaugeHtml += '<svg class="gauge-svg" width="110" height="110">';
+                gaugeHtml += '<circle class="gauge-bg" cx="55" cy="55" r="45"/>';
+                gaugeHtml += '<circle class="gauge-fill" cx="55" cy="55" r="45" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + offset + '"/>';
+                gaugeHtml += '</svg>';
+                gaugeHtml += '<div class="gauge-text">' + r.score + '%</div>';
+                gaugeHtml += '</div>';
+                gaugeHtml += '<div class="region-label">' + r.name + '</div>';
+                gaugeHtml += '</div>';
+            }
+            document.getElementById('mapContainer').innerHTML = gaugeHtml;
+            
+            var cardHtml = '';
+            for (var i = 0; i < regions.length; i++) {
+                var r = regions[i];
+                cardHtml += '<div class="top-region-card">';
+                cardHtml += '<h4>' + (i+1) + '순위: ' + r.name + ' (적합도 ' + r.score + '%)</h4>';
+                cardHtml += '<p><strong>' + r.desc + '</strong></p><ul>';
+                for (var j = 0; j < r.reasons.length; j++) {
+                    cardHtml += '<li>' + r.reasons[j] + '</li>';
+                }
+                cardHtml += '</ul></div>';
+            }
+            document.getElementById('topRegions').innerHTML = cardHtml;
+        }
+        
+        function displayRoadmap() {
+            var stages = [
+                {stage: '1단계: 수출바우처 사업 참여 (현재)', desc: '지금 바로 신청하여 해외 마케팅을 시작하세요. 2026년 공고는 2월 중 발표 예정이며, 선착순이 아닌 평가를 통해 선정됩니다.'},
+                {stage: '2단계: 초기 수출 실적 창출 (3~6개월)', desc: '전시회 참가, 온라인 판매, 바이어 상담을 통해 첫 수출 계약을 성사시키세요. 작은 실적이라도 만들어야 다음 단계로 진행됩니다.'},
+                {stage: '3단계: 수출 확대 및 다변화 (6~12개월)', desc: '수출국을 2~3개국으로 확대하고, 안정적인 거래처를 확보하세요. 이 단계에서 글로벌강소기업 1,000+ 사업에 도전할 수 있습니다.'},
+                {stage: '4단계: 글로벌 수출 우수기업 (12개월~)', desc: '연 수출액 100만불 이상, 안정적 수출 기반을 갖춘 기업으로 성장하세요. 월드클래스 300, 수출유망중소기업 등 상위 프로그램에 선정될 수 있습니다.'}
+            ];
+            
+            var html = '';
+            for (var i = 0; i < stages.length; i++) {
+                var st = stages[i];
+                html += '<div class="roadmap-item">';
+                html += '<h4>' + st.stage + '</h4>';
+                html += '<p>' + st.desc + '</p>';
+                html += '</div>';
+            }
+            document.getElementById('roadmapContent').innerHTML = html;
+        }
+        
+        function displayProposalGuide() {
+            var html = '<h4>1. 사업계획서 필수 포함 사항 (공고문 기준)</h4>';
+            html += '<ul>';
+            html += '<li><strong>기업 현황:</strong> 사업자등록증, 최근 재무제표, 인증서 사본</li>';
+            html += '<li><strong>수출 계획:</strong> 목표 시장, 목표 수출액, 구체적 추진 일정</li>';
+            html += '<li><strong>제품/서비스 소개:</strong> 경쟁력, 차별화 요소, 해외 인증 현황</li>';
+            html += '<li><strong>마케팅 전략:</strong> 진출 방식(B2B/B2C), 유통 채널, 판촉 계획</li>';
+            html += '<li><strong>소요 예산:</strong> 바우처 활용 계획, 서비스별 배분, 자부담 금액</li>';
+            html += '</ul>';
+            
+            html += '<h4>2. 평가 항목 및 배점</h4>';
+            html += '<ul>';
+            html += '<li><strong>기업 역량 (30점):</strong> 매출액, 인증, 수출 경험, 전담 인력</li>';
+            html += '<li><strong>사업 계획 (40점):</strong> 시장조사의 구체성, 실행 가능성, 목표의 적정성</li>';
+            html += '<li><strong>기대 효과 (30점):</strong> 수출 증대 기여도, 고용 창출, 지역경제 파급효과</li>';
+            html += '</ul>';
+            
+            html += '<h4>3. 작성 시 유의사항</h4>';
+            html += '<ul>';
+            html += '<li>막연한 계획보다는 <strong>구체적인 수치</strong>를 제시하세요 (목표 수출액, 바이어 수, 일정)</li>';
+            html += '<li>귀사만의 <strong>차별화 포인트</strong>를 명확히 기술하세요</li>';
+            html += '<li>과거 수출 시도 경험이 있다면 반드시 기재하세요 (실패 경험도 긍정적 평가)</li>';
+            html += '<li>바우처 서비스를 어떻게 활용할 것인지 <strong>구체적 활용 계획</strong>을 작성하세요</li>';
+            html += '</ul>';
+            
+            document.getElementById('proposalGuide').innerHTML = html;
+        }
+        
+        function displayRelatedPrograms() {
+            var programs = [
+                '전자상거래수출시장진출 지원사업 (356억원, 4,000개사) - 온라인 수출 지원',
+                '글로벌강소기업 1,000+ (200개사 선정) - 3년간 최대 10억원',
+                '해외수출규제대응지원 (인증 취득 비용 70% 지원)',
+                '소공인 해외진출 지원사업 (300개사) - 소규모 제조업 특화',
+                '수출컨소시엄 지원사업 - 여러 기업이 공동으로 수출',
+                'K-스타트업 글로벌진출 - 스타트업·벤처 특화',
+                '글로벌IP스타기업 육성 - 지식재산권 기반 수출',
+                '월드클래스 300 프로젝트 - 글로벌 강소기업 육성',
+                '대중소기업 동반진출 - 대기업과 협력 수출',
+                '무역협회 KITA 수출마케팅 지원 - 전시회, 상담회'
+            ];
+            
+            var html = '';
+            for (var i = 0; i < programs.length; i++) {
+                html += '<li>' + programs[i] + '</li>';
+            }
+            document.getElementById('relatedPrograms').innerHTML = html;
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeQuiz);
+        } else {
+            initializeQuiz();
+        }
+    </script>
+</body>
+</html>

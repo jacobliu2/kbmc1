@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소상공인 기본 자가진단</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #283f55;
+            --primary-dark: #1a2d3f;
+            --primary-light: #3d5a73;
+            --accent: #1e3a5f;
+            --accent-dark: #152a45;
+            --management: #5a3d2d;
+            --tech: #1e4d7b;
+            --finance: #2d5a4f;
+            --hr: #7b3d1e;
+            --bg-light: #f8f9fc;
+            --bg-white: #ffffff;
+            --text-dark: #1a1a2e;
+            --text-gray: #64748b;
+            --border: #e2e8f0;
+            --shadow: rgba(40, 63, 85, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #283f55 0%, #1a2d3f 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--bg-white);
+            padding: 50px 40px;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 20px 60px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .header h1 {
+            font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 1.05rem;
+            color: var(--text-gray);
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+
+        .header .sub-desc {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .resource-legend {
+            display: flex;
+            gap: 24px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.management { background: var(--management); }
+        .legend-dot.tech { background: var(--tech); }
+        .legend-dot.finance { background: var(--finance); }
+        .legend-dot.hr { background: var(--hr); }
+
+        .main-content {
+            background: var(--bg-white);
+            padding: 0;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 20px 60px var(--shadow);
+        }
+
+        .progress-bar {
+            background: var(--bg-light);
+            padding: 30px 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .progress-track {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .question-section {
+            padding: 50px 40px;
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .question-section.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-header {
+            margin-bottom: 35px;
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .question-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .question-subtitle {
+            font-size: 1rem;
+            color: var(--text-gray);
+            line-height: 1.7;
+        }
+
+        .resource-tags {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .resource-tag {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 2px solid;
+        }
+
+        .resource-tag.management {
+            background: rgba(90, 61, 45, 0.1);
+            border-color: var(--management);
+            color: var(--management);
+        }
+
+        .resource-tag.tech {
+            background: rgba(30, 77, 123, 0.1);
+            border-color: var(--tech);
+            color: var(--tech);
+        }
+
+        .resource-tag.finance {
+            background: rgba(45, 90, 79, 0.1);
+            border-color: var(--finance);
+            color: var(--finance);
+        }
+
+        .resource-tag.hr {
+            background: rgba(123, 61, 30, 0.1);
+            border-color: var(--hr);
+            color: var(--hr);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 30px;
+        }
+
+        .option {
+            background: var(--bg-light);
+            border: 3px solid transparent;
+            padding: 24px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .option:hover {
+            background: white;
+            border-color: var(--primary-light);
+            transform: translateX(8px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .option.selected {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 12px 32px var(--shadow);
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .option-radio {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--border);
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .option.selected .option-radio {
+            border-color: var(--primary);
+            background: var(--primary);
+        }
+
+        .option.selected .option-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .option-desc {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        .option-score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 16px;
+        }
+
+        button {
+            padding: 16px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .btn-prev {
+            background: var(--bg-light);
+            color: var(--text-gray);
+        }
+
+        .btn-prev:hover {
+            background: #dde3ed;
+            transform: translateX(-4px);
+        }
+
+        .btn-next, .btn-result {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            flex: 1;
+        }
+
+        .btn-next:hover, .btn-result:hover {
+            transform: translateX(4px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .btn-next:disabled, .btn-result:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            display: none;
+            padding: 50px 40px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .result-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .result-header p {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+        }
+
+        .result-chart {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px var(--shadow);
+            margin-bottom: 40px;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .chart-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            gap: 30px;
+            height: 300px;
+            padding: 0 20px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            height: 100%;
+        }
+
+        .chart-track {
+            width: 100%;
+            max-width: 100px;
+            height: 250px;
+            background: var(--bg-light);
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .chart-fill {
+            width: 100%;
+            border-radius: 10px 10px 0 0;
+            transition: height 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 0%;
+        }
+
+        .chart-fill.management { background: linear-gradient(180deg, var(--management), #442d1f); }
+        .chart-fill.tech { background: linear-gradient(180deg, var(--tech), #153a5f); }
+        .chart-fill.finance { background: linear-gradient(180deg, var(--finance), #234539); }
+        .chart-fill.hr { background: linear-gradient(180deg, var(--hr), #5a2d15); }
+
+        .chart-label {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-align: center;
+        }
+
+        .consultant-comment {
+            background: linear-gradient(135deg, rgba(40, 63, 85, 0.03), rgba(30, 58, 95, 0.05));
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .consultant-comment h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .consultant-comment h3::before {
+            content: '💼';
+            font-size: 1.6rem;
+        }
+
+        .consultant-comment-text {
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: var(--text-dark);
+            text-align: justify;
+            word-break: keep-all;
+        }
+
+        .contact-info {
+            background: var(--primary);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .contact-info p {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .contact-info .phone {
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .btn-restart {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .copyright {
+            text-align: center;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .header, .question-section, .result-section {
+                padding: 30px 24px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .question-title {
+                font-size: 1.25rem;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            .option-score {
+                position: static;
+                margin-top: 12px;
+                margin-left: auto;
+            }
+
+            .chart-bars {
+                height: 250px;
+                gap: 15px;
+            }
+
+            .chart-track {
+                max-width: 60px;
+                height: 200px;
+            }
+
+            .chart-label {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>소상공인 기본 자가진단</h1>
+            <p>귀사의 경영 역량을 진단하여, 경영·기술·자금·인력 측면의 맞춤형 개선 방향을 제시합니다.</p>
+            <p class="sub-desc">10개 질문으로 귀사의 현재 수준을 파악하고, 우선 개선 영역을 확인하세요.</p>
+            <div class="resource-legend">
+                <div class="legend-item">
+                    <div class="legend-dot management"></div>
+                    <span>경영 역량</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot tech"></div>
+                    <span>기술 역량</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot finance"></div>
+                    <span>자금 역량</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot hr"></div>
+                    <span>인력 역량</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="progress-bar">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">질문 1 / 10</div>
+            </div>
+
+            <!-- Question 1 -->
+            <div class="question-section active" data-question="1">
+                <div class="question-header">
+                    <span class="question-number">질문 1/10</span>
+                    <h2 class="question-title">고객 관리 및 매출 분석</h2>
+                    <p class="question-subtitle">귀사의 고객 정보 관리 및 매출 분석 수준은 어떠합니까?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag management">경영 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 관리 부재</div>
+                                <div class="option-desc">고객 정보를 별도로 관리하지 않으며, 매출도 대략적으로만 파악하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 수기 관리</div>
+                                <div class="option-desc">고객 정보를 수기나 엑셀로 기록하고 있으나, 체계적인 분석은 하지 못하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: 기본 분석</div>
+                                <div class="option-desc">POS나 간단한 프로그램으로 매출을 관리하며, 월별 매출 추이를 확인하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 체계적 관리</div>
+                                <div class="option-desc">고객 DB를 구축하여 재방문율, 구매 패턴 등을 분석하고 마케팅에 활용하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 데이터 기반 경영</div>
+                                <div class="option-desc">CRM 시스템으로 고객을 세분화하고, 데이터 기반으로 맞춤형 서비스와 마케팅을 실행합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()" style="visibility: hidden;">이전</button>
+                    <button class="btn-next" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-section" data-question="2">
+                <div class="question-header">
+                    <span class="question-number">질문 2/10</span>
+                    <h2 class="question-title">디지털 도구 활용</h2>
+                    <p class="question-subtitle">귀사의 업무용 디지털 도구 활용 수준은 어떠합니까?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag tech">기술 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 전통적 방식</div>
+                                <div class="option-desc">전화와 종이 문서 중심으로 업무를 처리하며, 디지털 도구는 거의 사용하지 않습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 기본 활용</div>
+                                <div class="option-desc">카카오톡, 이메일 등 기본적인 소통 도구만 사용하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: 부분 도입</div>
+                                <div class="option-desc">간단한 업무 관리 앱이나 회계 프로그램을 일부 사용하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 적극 활용</div>
+                                <div class="option-desc">협업 도구, 클라우드 저장소, 업무 자동화 도구 등을 적극 활용하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 디지털 혁신</div>
+                                <div class="option-desc">AI 챗봇, 데이터 분석 툴 등 최신 디지털 기술을 도입하여 업무 효율을 극대화했습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()">이전</button>
+                    <button class="btn-next" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-section" data-question="3">
+                <div class="question-header">
+                    <span class="question-number">질문 3/10</span>
+                    <h2 class="question-title">재무 관리 및 회계 처리</h2>
+                    <p class="question-subtitle">귀사의 재무제표 관리 및 회계 처리 수준은 어떠합니까?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag finance">자금 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 관리 미흡</div>
+                                <div class="option-desc">장부를 제대로 작성하지 않으며, 현금흐름을 정확히 파악하지 못하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 최소 수준</div>
+                                <div class="option-desc">세무 신고를 위한 최소한의 장부만 기장하고 있으며, 재무 상태를 자세히 모릅니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: 기본 관리</div>
+                                <div class="option-desc">세무사를 통해 정기적으로 장부를 관리하며, 월별 손익을 대략 파악하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 체계적 관리</div>
+                                <div class="option-desc">회계 프로그램으로 실시간 재무 현황을 파악하며, 손익분기점 등을 분석하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 고도화</div>
+                                <div class="option-desc">정밀한 원가 계산과 재무 분석을 통해 경영 의사결정에 활용하고, 자금 계획을 체계적으로 수립합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()">이전</button>
+                    <button class="btn-next" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-section" data-question="4">
+                <div class="question-header">
+                    <span class="question-number">질문 4/10</span>
+                    <h2 class="question-title">직원 채용 및 정착</h2>
+                    <p class="question-subtitle">귀사의 직원 채용 및 유지 현황은 어떠합니까?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag hr">인력 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 채용 어려움</div>
+                                <div class="option-desc">구인이 매우 어렵고, 채용해도 금방 그만두어 항상 인력난을 겪고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 불안정</div>
+                                <div class="option-desc">간헐적으로 직원을 채용하지만, 이직률이 높아 안정적인 운영이 어렵습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: 기본 충족</div>
+                                <div class="option-desc">필요한 인력은 확보하고 있으나, 채용 과정이 체계적이지 않고 이직률도 다소 높습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 안정적 운영</div>
+                                <div class="option-desc">체계적인 채용 절차가 있고, 직원들이 비교적 오래 근무하며 핵심 인력이 정착했습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 우수 인재 확보</div>
+                                <div class="option-desc">우수한 근무 환경과 복지로 인재를 유치하며, 지원자가 많아 선별 채용이 가능합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()">이전</button>
+                    <button class="btn-next" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-section" data-question="5">
+                <div class="question-header">
+                    <span class="question-number">질문 5/10</span>
+                    <h2 class="question-title">마케팅 및 홍보 활동</h2>
+                    <p class="question-subtitle">귀사의 마케팅 및 고객 유치 활동은 어느 정도입니까?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag management">경영 역량</span>
+                        <span class="resource-tag tech">기술 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 활동 없음</div>
+                                <div class="option-desc">별도의 마케팅 활동 없이 기존 고객과 입소문에만 의존하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 최소 수준</div>
+                                <div class="option-desc">간판이나 전단지 등 기본적인 오프라인 홍보만 하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: SNS 시작</div>
+                                <div class="option-desc">인스타그램, 블로그 등 SNS 계정을 운영하며 간헐적으로 콘텐츠를 올리고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 통합 마케팅</div>
+                                <div class="option-desc">온·오프라인을 결합한 마케팅을 실행하며, 정기적으로 이벤트와 프로모션을 진행합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 전략적 마케팅</div>
+                                <div class="option-desc">데이터 분석 기반으로 타겟 마케팅을 실행하고, 브랜딩과 콘텐츠 마케팅을 체계적으로 운영합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()">이전</button>
+                    <button class="btn-next" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-section" data-question="6">
+                <div class="question-header">
+                    <span class="question-number">질문 6/10</span>
+                    <h2 class="question-title">재고 및 원가 관리</h2>
+                    <p class="question-subtitle">귀사의 재고 관리 및 원가 파악 수준은 어떠합니까?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag management">경영 역량</span>
+                        <span class="resource-tag finance">자금 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 관리 부재</div>
+                                <div class="option-desc">재고를 체계적으로 관리하지 않으며, 정확한 원가도 파악하지 못하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 육안 확인</div>
+                                <div class="option-desc">재고를 눈으로 확인하며, 대략적인 원가만 알고 있어 재고 부족이나 과다가 자주 발생합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: 장부 기록</div>
+                                <div class="option-desc">엑셀이나 수기로 재고를 기록하며, 주요 품목의 원가를 파악하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 시스템 관리</div>
+                                <div class="option-desc">재고 관리 프로그램으로 실시간 재고를 파악하며, 품목별 정확한 원가를 계산하고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 최적화</div>
+                                <div class="option-desc">데이터 분석으로 적정 재고를 유지하고, 원가 절감 활동을 지속적으로 추진하여 수익성을 극대화합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()">이전</button>
+                    <button class="btn-next" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-section" data-question="7">
+                <div class="question-header">
+                    <span class="question-number">질문 7/10</span>
+                    <h2 class="question-title">자금 조달 및 운영</h2>
+                    <p class="question-subtitle">귀사의 운영 자금 확보 및 관리 상황은 어떠합니까?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag finance">자금 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 자금난 심각</div>
+                                <div class="option-desc">월세, 인건비 등 기본 경비 지급에도 항상 어려움을 겪고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 빠듯한 운영</div>
+                                <div class="option-desc">당장의 운영은 가능하나 여유 자금이 없어, 예상치 못한 지출에 대응하기 어렵습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: 안정적 운영</div>
+                                <div class="option-desc">정상적인 운영 자금은 확보되어 있으며, 필요시 은행 대출이나 정부 지원을 활용할 수 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 투자 여력</div>
+                                <div class="option-desc">안정적인 현금흐름을 유지하며, 설비나 인테리어 등 필요한 투자를 할 수 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 재무 우수</div>
+                                <div class="option-desc">충분한 자기자본과 여유 자금을 보유하여, 사업 확장이나 추가 점포 개설 등을 추진할 수 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()">이전</button>
+                    <button class="btn-next" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-section" data-question="8">
+                <div class="question-header">
+                    <span class="question-number">질문 8/10</span>
+                    <h2 class="question-title">직원 교육 및 복지</h2>
+                    <p class="question-subtitle">귀사의 직원 교육 및 복지 제공 수준은 어떠합니까?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag hr">인력 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 최소 수준</div>
+                                <div class="option-desc">별도의 교육 없이 현장에서 배우게 하며, 4대보험 외 복지는 거의 없습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 기본 제공</div>
+                                <div class="option-desc">신입 직원에게 간단한 OJT를 실시하고, 명절 상여 정도의 기본 복지만 제공합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: 부분 지원</div>
+                                <div class="option-desc">필요시 외부 교육을 지원하고, 식사 제공, 경조사비 등 일부 복지 혜택을 제공합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 체계적 운영</div>
+                                <div class="option-desc">정기적인 직무 교육을 실시하고, 건강검진, 휴가 지원 등 다양한 복지 제도를 운영합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 우수 기업</div>
+                                <div class="option-desc">체계적인 교육 프로그램과 우수한 복지로 직원 만족도가 높으며, 성과 인센티브 제도도 잘 갖춰져 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()">이전</button>
+                    <button class="btn-next" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <!-- Question 9 -->
+            <div class="question-section" data-question="9">
+                <div class="question-header">
+                    <span class="question-number">질문 9/10</span>
+                    <h2 class="question-title">온라인 판매 및 배달</h2>
+                    <p class="question-subtitle">귀사의 온라인 판매 및 배달 서비스 운영 현황은?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag tech">기술 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 오프라인 전용</div>
+                                <div class="option-desc">오프라인 매장에서만 판매하며, 온라인 채널은 전혀 활용하지 않습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 검토 단계</div>
+                                <div class="option-desc">온라인 판매나 배달앱 입점을 고려 중이나, 아직 실행하지 못했습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: 플랫폼 입점</div>
+                                <div class="option-desc">배달앱이나 온라인 마켓에 입점하여 판매하고 있으나, 매출 비중은 낮습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 활발한 운영</div>
+                                <div class="option-desc">여러 온라인 채널을 통해 활발히 판매하며, 전체 매출의 30% 이상을 온라인에서 발생시킵니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 온라인 강자</div>
+                                <div class="option-desc">자체 쇼핑몰을 운영하거나 온라인이 주력 채널이며, 옴니채널 전략으로 온·오프라인을 통합 운영합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()">이전</button>
+                    <button class="btn-next" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <!-- Question 10 -->
+            <div class="question-section" data-question="10">
+                <div class="question-header">
+                    <span class="question-number">질문 10/10</span>
+                    <h2 class="question-title">조직 문화 및 소통</h2>
+                    <p class="question-subtitle">귀사의 조직 문화와 내부 소통 수준은 어떠합니까?</p>
+                    <div class="resource-tags">
+                        <span class="resource-tag management">경영 역량</span>
+                        <span class="resource-tag hr">인력 역량</span>
+                    </div>
+                </div>
+                <div class="options">
+                    <div class="option" data-score="1">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">1단계: 소통 부재</div>
+                                <div class="option-desc">사장과 직원 간 대화가 거의 없고, 직원들의 불만이나 의견을 들을 기회가 없습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">1</div>
+                    </div>
+                    <div class="option" data-score="2">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">2단계: 일방적 지시</div>
+                                <div class="option-desc">사장의 지시가 주를 이루며, 직원들은 수동적으로 업무를 수행합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">2</div>
+                    </div>
+                    <div class="option" data-score="3">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">3단계: 기본 소통</div>
+                                <div class="option-desc">필요시 회의를 하고, 직원들의 의견을 간헐적으로 듣고 있습니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">3</div>
+                    </div>
+                    <div class="option" data-score="4">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">4단계: 협력적 문화</div>
+                                <div class="option-desc">정기적인 미팅으로 의견을 공유하며, 직원들이 자발적으로 업무 개선을 제안합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">4</div>
+                    </div>
+                    <div class="option" data-score="5">
+                        <label class="option-label">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-title">5단계: 수평적 조직</div>
+                                <div class="option-desc">열린 소통과 상호 존중의 문화가 정착되어, 모두가 주인의식을 갖고 능동적으로 일합니다.</div>
+                            </div>
+                        </label>
+                        <div class="option-score">5</div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button class="btn-prev" onclick="prevQuestion()">이전</button>
+                    <button class="btn-result" onclick="showResults()" disabled>결과 확인</button>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section">
+                <div class="result-header">
+                    <h2>진단 결과</h2>
+                    <p>귀사의 경영 역량을 4대 영역으로 분석했습니다.</p>
+                </div>
+
+                <div class="result-chart">
+                    <h3 class="chart-title">영역별 진단결과</h3>
+                    <div class="chart-bars">
+                        <div class="chart-bar">
+                            <div class="chart-track">
+                                <div class="chart-fill management" id="managementBar"></div>
+                            </div>
+                            <div class="chart-label">경영</div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-track">
+                                <div class="chart-fill tech" id="techBar"></div>
+                            </div>
+                            <div class="chart-label">기술</div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-track">
+                                <div class="chart-fill finance" id="financeBar"></div>
+                            </div>
+                            <div class="chart-label">자금</div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-track">
+                                <div class="chart-fill hr" id="hrBar"></div>
+                            </div>
+                            <div class="chart-label">인력</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="consultant-comment">
+                    <h3>컨설턴트 코멘트</h3>
+                    <div class="consultant-comment-text" id="consultantComment"></div>
+                </div>
+
+                <div class="contact-info">
+                    <p>해당 결과는 간이 자가진단이므로</p>
+                    <p>자세한 내용은 컨설턴트와 상담해주세요.</p>
+                    <p class="phone">☎ 02-6357-2025</p>
+                </div>
+
+                <button class="btn-restart" onclick="restart()">다시 진단하기</button>
+
+                <div class="copyright">
+                    © 코리아경영자문. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const answers = {};
+        let currentQuestion = 1;
+        const totalQuestions = 10;
+
+        // 각 질문이 어떤 영역에 배점되는지 정의
+        const questionResources = {
+            1: ['management'],
+            2: ['tech'],
+            3: ['finance'],
+            4: ['hr'],
+            5: ['management', 'tech'],
+            6: ['management', 'finance'],
+            7: ['finance'],
+            8: ['hr'],
+            9: ['tech'],
+            10: ['management', 'hr']
+        };
+
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const questionSection = this.closest('.question-section');
+                const questionNum = parseInt(questionSection.dataset.question);
+                const score = parseInt(this.dataset.score);
+                
+                questionSection.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                this.classList.add('selected');
+                answers[questionNum] = score;
+                
+                const button = questionSection.querySelector('.btn-next, .btn-result');
+                button.disabled = false;
+            });
+        });
+
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `질문 ${currentQuestion} / ${totalQuestions}`;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < totalQuestions) {
+                document.querySelector(`[data-question="${currentQuestion}"]`).classList.remove('active');
+                currentQuestion++;
+                document.querySelector(`[data-question="${currentQuestion}"]`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 1) {
+                document.querySelector(`[data-question="${currentQuestion}"]`).classList.remove('active');
+                currentQuestion--;
+                document.querySelector(`[data-question="${currentQuestion}"]`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function calculateScores() {
+            const scores = {
+                management: 0,
+                tech: 0,
+                finance: 0,
+                hr: 0
+            };
+
+            // 각 질문의 점수를 해당 영역에 배점
+            for (let q = 1; q <= totalQuestions; q++) {
+                const score = answers[q] || 0;
+                const resources = questionResources[q];
+                
+                resources.forEach(resource => {
+                    scores[resource] += score;
+                });
+            }
+
+            return scores;
+        }
+
+        function generateConsultantComment(scores) {
+            // 각 영역의 최대 점수: 경영 20점, 기술 15점, 자금 15점, 인력 15점
+            const maxScores = {
+                management: 20,
+                tech: 15,
+                finance: 15,
+                hr: 15
+            };
+
+            const managementPercent = (scores.management / maxScores.management) * 100;
+            const techPercent = (scores.tech / maxScores.tech) * 100;
+            const financePercent = (scores.finance / maxScores.finance) * 100;
+            const hrPercent = (scores.hr / maxScores.hr) * 100;
+
+            let comment = '귀사의 진단 결과를 종합적으로 분석한 결과, ';
+
+            // 전체 평균 수준 파악
+            const avgPercent = (managementPercent + techPercent + financePercent + hrPercent) / 4;
+            
+            if (avgPercent >= 70) {
+                comment += '귀사는 전반적으로 우수한 수준의 경영 역량을 보유하고 있습니다. ';
+            } else if (avgPercent >= 50) {
+                comment += '귀사는 중간 수준의 경영 역량을 갖추고 있으며, 일부 영역의 보완이 필요합니다. ';
+            } else {
+                comment += '귀사는 경영 역량 전반에 걸쳐 체계적인 개선이 필요한 단계입니다. ';
+            }
+
+            // 경영 역량 분석
+            if (managementPercent < 40) {
+                comment += '경영 역량 측면에서는 고객 관리 체계 구축이 시급합니다. POS 시스템이나 간단한 고객 관리 프로그램을 도입하여 매출 분석과 고객 데이터를 축적하시기 바랍니다. 재고 관리를 체계화하고 원가를 정확히 파악하는 것도 수익성 개선의 첫걸음입니다. ';
+            } else if (managementPercent < 70) {
+                comment += '경영 역량은 중급 수준으로, 데이터 기반 의사결정 체계를 강화할 시점입니다. CRM 시스템 도입을 검토하시고, 고객 세분화를 통한 타겟 마케팅을 추진하시기 바랍니다. 원가 절감 활동과 함께 수익성 분석을 정기적으로 실시하시면 경영 효율이 크게 향상될 것입니다. ';
+            } else {
+                comment += '경영 역량이 우수하므로, 이제는 사업 확장을 본격적으로 검토하실 단계입니다. 추가 점포 개설이나 프랜차이즈 전환, 새로운 사업 모델 개발 등을 통해 외연을 확대하시기 바랍니다. 브랜딩 강화와 함께 온·오프라인 통합 전략을 고도화하시면 더욱 견고한 사업 기반을 구축하실 수 있습니다. ';
+            }
+
+            // 기술 역량 분석
+            if (techPercent < 40) {
+                comment += '기술 역량 강화가 필요합니다. 먼저 카카오톡 채널, 네이버 예약 등 무료 디지털 도구부터 활용하시고, SNS 계정을 개설하여 정기적으로 콘텐츠를 올리시기 바랍니다. 배달앱이나 온라인 판매 플랫폼 입점도 적극 검토하시어 매출 채널을 다각화하시기 바랍니다. ';
+            } else if (techPercent < 70) {
+                comment += '기술 역량은 중급 수준으로, 디지털 마케팅을 본격화할 시점입니다. 인스타그램, 블로그 등 SNS 채널을 전략적으로 운영하시고, 온라인 광고도 시도해보시기 바랍니다. 협업 도구나 클라우드 서비스를 도입하여 업무 효율을 높이시고, 온라인 판매 비중을 점차 확대하시기 바랍니다. ';
+            } else {
+                comment += '기술 역량이 우수하므로, 이제는 AI나 빅데이터 등 첨단 기술 활용을 고려하실 수 있습니다. 자체 쇼핑몰 구축이나 O2O(Online to Offline) 서비스를 개발하시고, 마케팅 자동화 도구를 활용하여 효율을 극대화하시기 바랍니다. 고객 데이터 분석을 통한 개인화 서비스 제공으로 경쟁 우위를 확보하시기 바랍니다. ';
+            }
+
+            // 자금 역량 분석
+            if (financePercent < 40) {
+                comment += '자금 역량 개선이 가장 시급합니다. 세무사와 상담하여 재무제표를 정기적으로 관리하시고, 정부의 소상공인 지원 자금이나 저금리 융자 프로그램을 적극 활용하시기 바랍니다. 현금흐름을 철저히 관리하시고, 불필요한 지출을 줄여 재무 안정성을 우선 확보하시기 바랍니다. ';
+            } else if (financePercent < 70) {
+                comment += '자금 역량은 중급 수준으로, 이제는 전략적 투자를 고려하실 단계입니다. 회계 프로그램을 도입하여 실시간 재무 현황을 파악하시고, 품목별 수익성을 분석하여 고수익 품목에 집중하시기 바랍니다. 여유 자금을 활용한 설비 개선이나 인테리어 리뉴얼을 통해 경쟁력을 높이시기 바랍니다. ';
+            } else {
+                comment += '자금 역량이 매우 우수하므로, 공격적 성장 전략을 추진하실 수 있습니다. 신규 점포 개설이나 사업 다각화를 적극 검토하시고, M&A를 통한 사업 확장도 고려해보시기 바랍니다. 안정적인 재무 기반을 바탕으로 브랜드 가치를 높이고 시장 점유율을 확대하시기 바랍니다. ';
+            }
+
+            // 인력 역량 분석
+            if (hrPercent < 40) {
+                comment += '인력 역량 개선이 필요합니다. 채용 시 근무 조건을 명확히 하고, 4대보험은 물론 기본적인 복지 혜택을 제공하여 우수 인력을 유치하시기 바랍니다. 신입 직원에 대한 체계적인 교육을 실시하고, 직원들과 정기적으로 소통하여 불만을 사전에 해소하시기 바랍니다. ';
+            } else if (hrPercent < 70) {
+                comment += '인력 역량은 중급 수준으로, 직원 만족도를 높이고 조직 문화를 개선할 시점입니다. 외부 교육 기회를 제공하고, 성과급이나 인센티브 제도를 도입하여 동기부여를 강화하시기 바랍니다. 정기 미팅을 통해 의견을 수렴하고, 직원들의 아이디어를 적극 반영하여 참여 문화를 만들어가시기 바랍니다. ';
+            } else {
+                comment += '인력 역량이 우수하므로, 이제는 조직을 더욱 체계화하고 성장시킬 단계입니다. 직원들에게 지분을 제공하거나 파트너십을 맺는 방안도 검토해보시기 바랍니다. 우수한 인재를 핵심 간부로 육성하시고, 수평적이고 자율적인 조직 문화를 더욱 공고히 하여 함께 성장하는 조직을 만들어가시기 바랍니다. ';
+            }
+
+            // 종합 제안
+            const weakAreas = [];
+            if (managementPercent < 50) weakAreas.push('경영');
+            if (techPercent < 50) weakAreas.push('기술');
+            if (financePercent < 50) weakAreas.push('자금');
+            if (hrPercent < 50) weakAreas.push('인력');
+
+            if (weakAreas.length > 0) {
+                comment += `특히 ${weakAreas.join(', ')} 영역의 집중적인 개선을 통해 균형 잡힌 성장 기반을 마련하시기를 권장드립니다. `;
+            }
+
+            comment += '보다 구체적이고 실행 가능한 개선 방안 수립을 위해서는 전문 컨설턴트와의 상담을 통해 귀사의 상황에 최적화된 맞춤형 솔루션을 찾으시기 바랍니다.';
+
+            return comment;
+        }
+
+        function showResults() {
+            const scores = calculateScores();
+            
+            document.querySelector(`[data-question="${currentQuestion}"]`).classList.remove('active');
+            document.querySelector('.result-section').classList.add('active');
+            document.querySelector('.progress-bar').style.display = 'none';
+
+            // 각 영역의 백분율 계산 (최대 점수 대비)
+            const maxScores = {
+                management: 20,
+                tech: 15,
+                finance: 15,
+                hr: 15
+            };
+
+            const managementPercent = Math.round((scores.management / maxScores.management) * 100);
+            const techPercent = Math.round((scores.tech / maxScores.tech) * 100);
+            const financePercent = Math.round((scores.finance / maxScores.finance) * 100);
+            const hrPercent = Math.round((scores.hr / maxScores.hr) * 100);
+
+            // 차트 애니메이션
+            setTimeout(() => {
+                document.getElementById('managementBar').style.height = managementPercent + '%';
+                document.getElementById('techBar').style.height = techPercent + '%';
+                document.getElementById('financeBar').style.height = financePercent + '%';
+                document.getElementById('hrBar').style.height = hrPercent + '%';
+            }, 100);
+
+            // 컨설턴트 코멘트 생성
+            const consultantComment = generateConsultantComment(scores);
+            document.getElementById('consultantComment').textContent = consultantComment;
+        }
+
+        function restart() {
+            Object.keys(answers).forEach(key => delete answers[key]);
+            currentQuestion = 1;
+            
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.btn-next, .btn-result').forEach(button => {
+                button.disabled = true;
+            });
+            
+            document.querySelector('.result-section').classList.remove('active');
+            document.querySelector('[data-question="1"]').classList.add('active');
+            document.querySelector('.progress-bar').style.display = 'block';
+            
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        updateProgress();
+    </script>
+</body>
+</html>
